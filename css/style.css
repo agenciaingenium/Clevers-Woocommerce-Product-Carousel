@@ -1,0 +1,42 @@
+:root {
+    --ingenium-primary: #3498db; /* Azul */
+    --ingenium-seconday: #2ecc71; /* Verde */
+    --ingenium-background: #ecf0f1; /* Gris claro */
+}
+
+.slick-next:before,.slick-prev:before{
+    color:var(--ingenium-primary);
+}
+
+.ingenium-product{
+    margin:10px;
+    -webkit-box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
+    box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
+    border-radius: 5px;
+    padding: 5px;
+    min-height: 450px;
+    text-align: center;
+}
+.ingenium-product img{
+    margin:0 auto;
+}
+
+.ingenium-button{
+    background: var(--ingenium-primary);
+    padding: 5px 20px;
+    border-radius: 5px;
+    color:white;
+    text-align: center;
+    margin: 0 auto;
+}
+.ingenium-button:hover{
+    color:white;
+    background: var(--ingenium-seconday);
+}
+
+@media (max-width: 425px) {
+    .ingenium-product{
+        width: 100% !important;
+    }
+}
