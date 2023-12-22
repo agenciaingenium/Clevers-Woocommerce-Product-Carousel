@@ -89,7 +89,7 @@ print_r($atts);
                     echo $product->get_image();
                     ?>
                     <h3><?php echo $product->get_name(); ?></h3>
-                    <p><?php echo $product->get_price_html(); ?></p>
+                    <p class="ingenium-price"><span><?php echo $product->get_price_html(); ?></span><span><?php $product->get_sale_price(); ?></span></p>
                     <a href="<?php echo $product->add_to_cart_url() ?>"
                        value="<?php echo esc_attr($product->get_id()); ?>"
                        class="ingenium-button ajax_add_to_cart add_to_cart_button"
