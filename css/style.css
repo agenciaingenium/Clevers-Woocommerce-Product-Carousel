@@ -1,53 +1,124 @@
-.slick-next:before,.slick-prev:before{
-    color:var(--ingenium-primary);
+.slick-next:before, .slick-prev:before {
+    color: var(--ingenium-primary);
 }
 
-.ingenium-product{
-    margin:10px;
-    -webkit-box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
-    box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.15);
-    border-radius: 5px;
-    padding: 10px;
+.ingenium-carousel .slick-slide {
+    margin: 10px;
     min-height: 450px;
-    text-align: center;
+    padding: 10px 0;
     display: flex !important;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+
 }
-.ingenium-product img{
-    margin:0 auto;
+
+.ingenium-product {
+
+    -webkit-box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+
+    text-align: center;
+
 }
-.ingenium-product h3{
-    margin-top:5px;
-    font-size:20px;
+
+.ingenium-product img {
+    margin: 0 auto;
 }
-.ingenium-price{
-    font-size:18px;
+
+.ingenium-product h3 {
+    margin-top: 5px;
+    font-size: 20px;
 }
-.ingenium-button{
+
+.ingenium-price {
+    font-size: 18px;
+}
+
+.ingenium-button {
     background: var(--ingenium-primary);
     padding: 5px 20px;
     border-radius: 5px;
-    color:white;
+    color: white;
     text-align: center;
-    margin: 0 auto;
+    margin: 5px auto;
     text-decoration: none !important;
     align-self: flex-end;
 
 }
-.ingenium-button:hover{
-    color:white;
-    background: var(--ingenium-seconday);
-}
-.ingenium-button:checked{
-    color:white;
+
+.ingenium-button:hover {
+    color: white;
     background: var(--ingenium-seconday);
 }
 
+.ingenium-button:active {
+    color: white;
+    background: var(--ingenium-seconday);
+}
+
+.ingenium-button:checked {
+    color: white;
+    background: var(--ingenium-seconday);
+}
+
+.product-title{
+    font-weight: bold;
+    font-size: 16px;
+}
+.detail-prices{
+    margin-top: 10px;
+
+}
+.detail {
+    margin: 0 !important;
+    font-size: 11px;
+
+}
+.details-price{
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 0 !important;
+
+}
+.details-price del{
+    font-size: 14px;
+    font-weight: 600;
+
+}
+.wholesaler-prices{
+    color:var(--ingenium-primary);
+}
+
+.wholesaler {
+    margin: 0 !important;
+    font-size: 11px;
+}
+
+.wholesalers-price {
+    margin: 0 !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+
 @media (max-width: 425px) {
-    .ingenium-product{
+    .ingenium-product {
         width: 100% !important;
+        padding: 5% !important;
+        min-height: 400px !important;
+    }
+
+    .ingenium-carousel {
+        max-width: 90%;
+        min-width: 90%;
+        margin: 0 auto;
+    }
+    .product-title{
+        margin:0 !important;
+        font-size: 14px !important;
     }
 }

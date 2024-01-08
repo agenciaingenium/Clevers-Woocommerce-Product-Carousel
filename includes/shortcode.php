@@ -47,10 +47,10 @@ function slick_woocommerce_carousel_shortcode($atts)
 
     ob_start();
     ?>
-    <div class="slick-carousel custom-carousel">
+    <div class="slick-carousel ingenium-carousel">
 
         <?php
-print_r($atts);
+        print_r($atts);
         $query = new WC_Product_Query();
         if ($atts['on_sale']) {
             $ids_ofertas = wc_get_product_ids_on_sale();
@@ -81,22 +81,45 @@ print_r($atts);
         if (!empty($products)) {
             // Hay productos, puedes trabajar con ellos
             foreach ($ordered as $product) {
-                //print_r($product->get_name());
+                $price_tiers = get_post_meta($product->get_id(), 'b2bking_product_pricetiers_group_b2c', true);
+                $pricesWholesale = explode(":", $price_tiers);
+                if (count($pricesWholesale) > 1) {
+                    $priceWholesale = str_replace(';', '', $pricesWholesale[1]);
+                    $priceWholesale = number_format($priceWholesale, 0, ',', '.');
+                }
+
+
                 ?>
                 <div class="slick-slide ingenium-product">
-                    <?php
-                    // Mostrar la imagen del producto
-                    echo $product->get_image();
-                    ?>
-                    <h3><?php echo $product->get_name(); ?></h3>
-                    <p class="ingenium-price"><span><?php echo $product->get_price_html(); ?></span><span><?php $product->get_sale_price(); ?></span></p>
+                    <a href="<?php echo $product->get_permalink()?>"><?php
+                        // Mostrar la imagen del producto
+                        echo $product->get_image();
+                        ?>
+                    </a>
+                    <h3 class="product-title"><?php echo $product->get_name(); ?></h3>
+
+                    <?php if (count($pricesWholesale) > 1) { ?>
+                        <div class="wholesaler-prices">
+                            <p class='wholesaler'>
+                                Mayorista: </p>
+                            <p class='wholesalers-price'>$ <?php echo $priceWholesale ?></p>
+                        </div>
+                    <?php } ?>
+                    <div class="detail-prices">
+                        <p class="detail">Detalle</p>
+                        <p class="details-price">
+                            <?php echo $product->get_price_html(); ?>
+                        </p>
+                    </div>
                     <a href="<?php echo $product->add_to_cart_url() ?>"
                        value="<?php echo esc_attr($product->get_id()); ?>"
                        class="ingenium-button ajax_add_to_cart add_to_cart_button"
                        data-product_id="<?php echo $product->get_id(); ?>"
                        data-product_sku="<?php echo esc_attr($sku) ?>"
                        aria-label="Add “<?php the_title_attribute() ?>” to your cart">
-                        Añadir al carro
+                        <?php $buttonName = $product->is_type('simple') ? "Añadir al carro" : "Seleccionar Opciones";
+                        echo $buttonName;
+                        ?>
                     </a>
                 </div>
                 <?php
@@ -116,6 +139,34 @@ print_r($atts);
                 slidesToScroll: 1,
                 prevArrow: '<button type="button" class="slick-prev">Previous</button>',
                 nextArrow: '<button type="button" class="slick-next">Next</button>',
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: true
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 1
+                        }
+                    }
+                    // You can unslick at a given breakpoint now by adding:
+                    // settings: "unslick"
+                    // instead of a settings object
+                ]
             });
 
             // Manejar el clic del botón "Agregar al carrito" mediante Ajax
