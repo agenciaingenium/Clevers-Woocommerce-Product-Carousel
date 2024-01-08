@@ -50,7 +50,7 @@ function slick_woocommerce_carousel_shortcode($atts)
     <div class="slick-carousel ingenium-carousel">
 
         <?php
-        print_r($atts);
+        //print_r($atts);
         $query = new WC_Product_Query();
         if ($atts['on_sale']) {
             $ids_ofertas = wc_get_product_ids_on_sale();
@@ -85,18 +85,21 @@ function slick_woocommerce_carousel_shortcode($atts)
                 $pricesWholesale = explode(":", $price_tiers);
                 if (count($pricesWholesale) > 1) {
                     $priceWholesale = str_replace(';', '', $pricesWholesale[1]);
-                    $priceWholesale = number_format($priceWholesale, 0, ',', '.');
+
+                    $priceWholesale = number_format(intval($priceWholesale), 0, ',', '.');
                 }
 
 
                 ?>
                 <div class="slick-slide ingenium-product">
-                    <a href="<?php echo $product->get_permalink()?>"><?php
+                    <a href="<?php echo $product->get_permalink() ?>"><?php
                         // Mostrar la imagen del producto
                         echo $product->get_image();
                         ?>
                     </a>
-                    <h3 class="product-title"><?php echo $product->get_name(); ?></h3>
+                    <a href="<?php echo $product->get_permalink() ?>">
+                        <h3 class="product-title"><?php echo $product->get_name(); ?></h3>
+                    </a>
 
                     <?php if (count($pricesWholesale) > 1) { ?>
                         <div class="wholesaler-prices">
@@ -111,16 +114,19 @@ function slick_woocommerce_carousel_shortcode($atts)
                             <?php echo $product->get_price_html(); ?>
                         </p>
                     </div>
-                    <a href="<?php echo $product->add_to_cart_url() ?>"
-                       value="<?php echo esc_attr($product->get_id()); ?>"
-                       class="ingenium-button ajax_add_to_cart add_to_cart_button"
-                       data-product_id="<?php echo $product->get_id(); ?>"
-                       data-product_sku="<?php echo esc_attr($sku) ?>"
-                       aria-label="Add “<?php the_title_attribute() ?>” to your cart">
-                        <?php $buttonName = $product->is_type('simple') ? "Añadir al carro" : "Seleccionar Opciones";
-                        echo $buttonName;
-                        ?>
-                    </a>
+                    <?php if ($product->is_type('simple')) { ?>
+                        <a href="<?php echo $product->add_to_cart_url() ?>"
+                           value="<?php echo esc_attr($product->get_id()); ?>"
+                           class="ingenium-button ajax_add_to_cart add_to_cart_button"
+                           data-product_id="<?php echo $product->get_id(); ?>"
+                           data-product_sku="<?php echo esc_attr($sku) ?>"
+                           aria-label="Add “<?php the_title_attribute() ?>” to your cart">
+                            Añadir al carro
+                        </a>
+                    <?php } else {
+                        echo '<a class="ingenium-button" href="' . $product->get_permalink() . '">Seleccionar Opciones</a>';
+                    }
+                    ?>
                 </div>
                 <?php
             }
