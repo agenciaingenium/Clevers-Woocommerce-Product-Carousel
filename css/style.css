@@ -28,6 +28,9 @@
     margin: 0 auto;
 }
 
+.ingenium-product a{
+    text-decoration: none !important ;
+}
 .ingenium-product h3 {
     margin-top: 5px;
     font-size: 20px;

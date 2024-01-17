@@ -7,6 +7,7 @@ Author: Agencia Ingenium
 */
 
 
+
 // Incluir el archivo de administración
 include_once 'includes/admin.php';
 
@@ -15,7 +16,8 @@ include_once 'includes/shortcode.php';
 
 
 // Función para agregar una página de opciones en el menú de administración
-function agregar_pagina_opciones() {
+function agregar_pagina_opciones()
+{
     global $submenu;
     add_menu_page(
         'Opciones de Color',  // Título de la página
@@ -25,6 +27,7 @@ function agregar_pagina_opciones() {
         'mostrar_pagina_opciones'  // Función que mostrará la página
     );
 }
+
 add_action('admin_menu', 'agregar_pagina_opciones');
 
 add_action("admin_menu", "crear_menu");
@@ -43,7 +46,8 @@ function output_menu()
 }
 
 // Función para mostrar el contenido de la página de opciones
-function mostrar_pagina_opciones() {
+function mostrar_pagina_opciones()
+{
     ?>
     <div class="wrap">
         <h1>Opciones de Color</h1>
@@ -61,7 +65,8 @@ function mostrar_pagina_opciones() {
 }
 
 // Función para inicializar y registrar las opciones de color
-function inicializar_opciones_color() {
+function inicializar_opciones_color()
+{
     add_settings_section(
         'seccion-opciones-color',
         'Configuración de Colores',
@@ -106,7 +111,7 @@ function inicializar_opciones_color() {
         'color-primary',
         array(
             'sanitize_callback' => 'sanitize_hex_color',
-            'default'           => '#3498db', // Valor predeterminado
+            'default' => '#3498db', // Valor predeterminado
         )
     );
 
@@ -115,7 +120,7 @@ function inicializar_opciones_color() {
         'color-secondary',
         array(
             'sanitize_callback' => 'sanitize_hex_color',
-            'default'           => '#3498db', // Valor predeterminado
+            'default' => '#3498db', // Valor predeterminado
         )
     );
 
@@ -124,7 +129,7 @@ function inicializar_opciones_color() {
         'color-background',
         array(
             'sanitize_callback' => 'sanitize_hex_color',
-            'default'           => '#3498db', // Valor predeterminado
+            'default' => '#3498db', // Valor predeterminado
         )
     );
 
@@ -149,15 +154,18 @@ function inicializar_opciones_color() {
         )
     );
 }
+
 add_action('admin_init', 'inicializar_opciones_color');
 
 // Función para mostrar la sección de opciones
-function mostrar_seccion_opciones() {
+function mostrar_seccion_opciones()
+{
     echo 'Personaliza los colores para tu tema o plugin.';
 }
 
 // Función para mostrar el campo de color primario
-function showColors() {
+function showColors()
+{
     $primary = get_option('color-primary', '#3498db');
     $secondary = get_option('color-secondary', '#3498db');
     $background = get_option('color-background', '#3498db');
@@ -167,9 +175,9 @@ function showColors() {
 }
 
 
-
 // Función para mostrar el campo de categoría
-function mostrar_campo_categoria() {
+function mostrar_campo_categoria()
+{
     $categorias = get_terms('category', array('hide_empty' => false));
     $categoria_actual = get_option('categoria');
     ?>
@@ -183,7 +191,8 @@ function mostrar_campo_categoria() {
 }
 
 // Función para mostrar el campo de orden
-function mostrar_campo_orden() {
+function mostrar_campo_orden()
+{
     $orden_actual = get_option('orden', 'date');
     ?>
     <select name="orden">
@@ -195,7 +204,8 @@ function mostrar_campo_orden() {
 }
 
 // Función para mostrar el campo de ofertas
-function mostrar_campo_ofertas() {
+function mostrar_campo_ofertas()
+{
     $ofertas = get_option('ofertas', false);
     ?>
     <label>

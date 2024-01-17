@@ -50,8 +50,6 @@ function slick_woocommerce_carousel_shortcode($atts)
     <div class="slick-carousel ingenium-carousel">
 
         <?php
-        //print_r($atts);
-        $query = new WC_Product_Query();
         if ($atts['on_sale']) {
             $ids_ofertas = wc_get_product_ids_on_sale();
             $args['include'] = array_values($ids_ofertas);
@@ -64,11 +62,9 @@ function slick_woocommerce_carousel_shortcode($atts)
                 'category' => array($atts['category']),
             );
         } else {
-
             // Obtener productos de WooCommerce
             $args = array(
                 'limit' => $atts['limit'],
-                'include' => $ids
             );
         }
 
@@ -81,12 +77,13 @@ function slick_woocommerce_carousel_shortcode($atts)
         if (!empty($products)) {
             // Hay productos, puedes trabajar con ellos
             foreach ($ordered as $product) {
+
                 $price_tiers = get_post_meta($product->get_id(), 'b2bking_product_pricetiers_group_b2c', true);
                 $pricesWholesale = explode(":", $price_tiers);
                 if (count($pricesWholesale) > 1) {
-                    $priceWholesale = str_replace(';', '', $pricesWholesale[1]);
+                    $priceWholesale = intval(str_replace(';', '', $pricesWholesale[1]));
 
-                    $priceWholesale = number_format(intval($priceWholesale), 0, ',', '.');
+                    $priceWholesaleFormat = number_format($priceWholesale, 0, ',', '.');
                 }
 
 
@@ -101,17 +98,30 @@ function slick_woocommerce_carousel_shortcode($atts)
                         <h3 class="product-title"><?php echo $product->get_name(); ?></h3>
                     </a>
 
-                    <?php if (count($pricesWholesale) > 1) { ?>
+                    <?php if (count($pricesWholesale) > 1 && $priceWholesale > 0 && $product->is_type('simple')) { ?>
                         <div class="wholesaler-prices">
                             <p class='wholesaler'>
                                 Mayorista: </p>
-                            <p class='wholesalers-price'>$ <?php echo $priceWholesale ?></p>
+                            <p class='wholesalers-price'>$ <?php echo $priceWholesaleFormat ?></p>
+                        </div>
+                    <?php } ?>
+
+                    <?php if ($product->is_type('variable')) {
+                        //var_dump($product->get_children()) ?>
+                        <div class="wholesaler-prices">
+                            <p class='wholesaler'>
+                                Mayorista: </p>
+                            <p class='wholesalers-price'>Ver precios según variación</p>
                         </div>
                     <?php } ?>
                     <div class="detail-prices">
                         <p class="detail">Detalle</p>
                         <p class="details-price">
-                            <?php echo $product->get_price_html(); ?>
+                            <?php if ($product->is_type('simple')) {
+                                echo $product->get_price_html();
+                            } else {
+                                echo "Desde: $" . number_format($product->get_variation_price(), 0, ',', '.');
+                            } ?>
                         </p>
                     </div>
                     <?php if ($product->is_type('simple')) { ?>
@@ -119,11 +129,13 @@ function slick_woocommerce_carousel_shortcode($atts)
                            value="<?php echo esc_attr($product->get_id()); ?>"
                            class="ingenium-button ajax_add_to_cart add_to_cart_button"
                            data-product_id="<?php echo $product->get_id(); ?>"
-                           data-product_sku="<?php echo esc_attr($sku) ?>"
+                           data-product_sku="<?php echo $product->get_sku() ?>"
                            aria-label="Add “<?php the_title_attribute() ?>” to your cart">
                             Añadir al carro
                         </a>
                     <?php } else {
+                        //var_dump($product->get_children());
+
                         echo '<a class="ingenium-button" href="' . $product->get_permalink() . '">Seleccionar Opciones</a>';
                     }
                     ?>
@@ -143,6 +155,8 @@ function slick_woocommerce_carousel_shortcode($atts)
             $('.slick-carousel').slick({
                 slidesToShow: <?php echo $atts['num_per_slide']; ?>,
                 slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 2000,
                 prevArrow: '<button type="button" class="slick-prev">Previous</button>',
                 nextArrow: '<button type="button" class="slick-next">Next</button>',
                 responsive: [
@@ -172,7 +186,8 @@ function slick_woocommerce_carousel_shortcode($atts)
                     // You can unslick at a given breakpoint now by adding:
                     // settings: "unslick"
                     // instead of a settings object
-                ]
+                ],
+
             });
 
             // Manejar el clic del botón "Agregar al carrito" mediante Ajax
