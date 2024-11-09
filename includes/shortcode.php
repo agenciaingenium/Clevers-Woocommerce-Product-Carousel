@@ -46,33 +46,29 @@ function slick_woocommerce_carousel_shortcode($atts)
     );
 
     ob_start();
+
+    $args = array(
+        'limit' => $atts['limit'],
+        'stock_status'=>'instock'
+    );
+    if ($atts['on_sale']) {
+        $ids_ofertas = wc_get_product_ids_on_sale();
+        $args['include'] = array_values($ids_ofertas);
+    } elseif ($atts['on_featured']) {
+        $ids = wc_get_featured_product_ids();
+        $args['include'] = array_values($ids);
+    } elseif ($atts['category'] != NULL) {
+        $args['category'] = array($atts['category']);
+    }
+
+
+    $query = new WC_Product_Query($args);
+    $products = $query->get_products();
+
+    $ordered = wc_products_array_orderby($products, $atts['orderBy'], $atts['direction']);
     ?>
     <div class="slick-carousel ingenium-carousel">
-
         <?php
-        if ($atts['on_sale']) {
-            $ids_ofertas = wc_get_product_ids_on_sale();
-            $args['include'] = array_values($ids_ofertas);
-        } elseif ($atts['on_featured']) {
-            $ids = wc_get_featured_product_ids();
-            $args['include'] = array_values($ids);
-        } elseif ($atts['category'] != NULL) {
-            $args = array(
-                'limit' => $atts['limit'],
-                'category' => array($atts['category']),
-            );
-        } else {
-            // Obtener productos de WooCommerce
-            $args = array(
-                'limit' => $atts['limit'],
-            );
-        }
-
-        $query = new WC_Product_Query($args);
-        $products = $query->get_products();
-
-        $ordered = wc_products_array_orderby($products, $atts['orderBy'], $atts['direction']);
-
         // Comprobar si hay productos
         if (!empty($products)) {
             // Hay productos, puedes trabajar con ellos
