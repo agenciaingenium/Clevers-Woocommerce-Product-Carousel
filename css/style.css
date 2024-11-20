@@ -15,9 +15,9 @@
 
 .ingenium-product {
 
-    -webkit-box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
-    box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.15);
     border-radius: 5px;
 
     text-align: center;
@@ -105,7 +105,65 @@
     font-size: 14px;
     font-weight: bold;
 }
+a.ingenium-button.ajax_add_to_cart.add_to_cart_button.added:after {
+    font-family: WooCommerce, serif;
+    content: '\e017';
+    margin-left: .53em;
+    vertical-align: bottom;
+}
+a.ingenium-button.ajax_add_to_cart.add_to_cart_button.loading:after{
+    display: inline-block;
+    content: "";
+    position: relative;
+    top: 0;
+    right: -.5em;
+    left: auto;
+    width: .8em;
+    height: .8em;
+    background-color: white;
+    background-image: none;
+    border-radius: 100%;
+    animation: dotPulse .65s 0s infinite cubic-bezier(.21,.53,.56,.8);
+}
 
+a.ingenium-button.ajax_add_to_cart.add_to_cart_button:focus {
+    color: white !important;
+}
+.ing-on-card-button.ast-onsale-card {
+    opacity: 1;
+    visibility: visible;
+}
+.ing-onsale-card {
+    color: var(--ingenium-seconday);
+    border-color: var(--ingenium-primary);
+}
+.ing-on-card-button {
+    position: relative;
+    right: 1em;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 5;
+    cursor: pointer;
+}
+.ing-onsale-card {
+    position: relative;
+    top: 1.5em;
+    left: 1.5em;
+    color: white;
+    background-color: var(--ingenium-seconday);
+    width: fit-content;
+    border-radius: 20px;
+    padding: 0.4em 0.8em;
+    font-size: .87em;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: normal;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+    visibility: visible;
+    z-index: 4;
+}
 
 
 @media (max-width: 425px) {

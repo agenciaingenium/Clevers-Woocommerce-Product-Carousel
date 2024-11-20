@@ -49,7 +49,7 @@ function slick_woocommerce_carousel_shortcode($atts)
 
     $args = array(
         'limit' => $atts['limit'],
-        'stock_status'=>'instock'
+        'stock_status' => 'instock'
     );
     if ($atts['on_sale']) {
         $ids_ofertas = wc_get_product_ids_on_sale();
@@ -81,11 +81,21 @@ function slick_woocommerce_carousel_shortcode($atts)
 
                     $priceWholesaleFormat = number_format($priceWholesale, 0, ',', '.');
                 }
+                $discount = get_product_discount_percentage($product->id)
 
 
                 ?>
                 <div class="slick-slide ingenium-product">
-                    <a href="<?php echo $product->get_permalink() ?>"><?php
+                    <a href="<?php echo $product->get_permalink() ?>">
+                        <?php if (!is_null($discount)) { ?>
+
+                        <div style="text-align:left;height: 0">
+                            <span class="ing-on-card-button ing-onsale-card circle" data-sale="[]"
+                                  data-notification="sale-percentage"
+                                  data-sale-per-text="-[value]%"><?php echo "-" .$discount  . "%" ?></span>
+                        </div>
+                        <?php
+                        }
                         // Mostrar la imagen del producto
                         echo $product->get_image();
                         ?>
@@ -215,3 +225,29 @@ function slick_woocommerce_carousel_shortcode($atts)
 }
 
 add_shortcode('slick_woocommerce_carousel', 'slick_woocommerce_carousel_shortcode');
+
+function get_product_discount_percentage($product_id)
+{
+    // Obtener el producto
+    $product = wc_get_product($product_id);
+
+    // Asegurarse de que es un producto válido
+    if (!$product) {
+        return null;
+    }
+
+    // Obtener el precio regular y el precio de oferta
+    $regular_price = $product->get_regular_price();
+    $sale_price = $product->get_sale_price();
+
+    // Si no hay precio de oferta, no hay descuento
+    if (empty($sale_price) || empty($regular_price)) {
+        return null;
+    }
+
+    // Calcular el porcentaje de descuento
+    $discount_percentage = (($regular_price - $sale_price) / $regular_price) * 100;
+
+    // Redondear a 2 decimales
+    return round($discount_percentage);
+}
