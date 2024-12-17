@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ingenium Woocommerce Product Carousel
 Description: Plugin simple para mostrar un carousel de Bootstrap.
-Version: 1.3
+Version: 1.3.1
 Author: Agencia Ingenium
 */
 

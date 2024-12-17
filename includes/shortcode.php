@@ -72,7 +72,9 @@ function slick_woocommerce_carousel_shortcode($atts)
         // Comprobar si hay productos
         if (!empty($products)) {
             // Hay productos, puedes trabajar con ellos
-            foreach ($ordered as $product) {
+            foreach ($ordered
+
+                     as $product) {
 
                 $price_tiers = get_post_meta($product->get_id(), 'b2bking_product_pricetiers_group_b2c', true);
                 $pricesWholesale = explode(":", $price_tiers);
@@ -89,12 +91,12 @@ function slick_woocommerce_carousel_shortcode($atts)
                     <a href="<?php echo $product->get_permalink() ?>">
                         <?php if (!is_null($discount)) { ?>
 
-                        <div style="text-align:left;height: 0">
+                            <div style="text-align:left;height: 0">
                             <span class="ing-on-card-button ing-onsale-card circle" data-sale="[]"
                                   data-notification="sale-percentage"
-                                  data-sale-per-text="-[value]%"><?php echo "-" .$discount  . "%" ?></span>
-                        </div>
-                        <?php
+                                  data-sale-per-text="-[value]%"><?php echo "-" . $discount . "%" ?></span>
+                            </div>
+                            <?php
                         }
                         // Mostrar la imagen del producto
                         echo $product->get_image();
@@ -104,33 +106,37 @@ function slick_woocommerce_carousel_shortcode($atts)
                         <h3 class="product-title"><?php echo $product->get_name(); ?></h3>
                     </a>
 
-                    <?php if (count($pricesWholesale) > 1 && $priceWholesale > 0 && $product->is_type('simple')) { ?>
-                        <div class="wholesaler-prices">
-                            <p class='wholesaler'>
-                                Mayorista: </p>
-                            <p class='wholesalers-price'>$ <?php echo $priceWholesaleFormat ?></p>
-                        </div>
-                    <?php } ?>
+                    <?php
+                    if (count($pricesWholesale) > 1 && $priceWholesale > 0) {
+                        if ($product->is_type('simple')) {
+                            ?>
+                            <div class="wholesaler-prices">
+                                <p class='wholesaler'> Mayorista: </p>
+                                <p class='wholesalers-price'>$ <?php echo $priceWholesaleFormat ?></p>
+                            </div>
+                        <?php } elseif
+                        ($product->is_type('variable')) { ?>
+                            <div class="wholesaler-prices">
+                                <p class='wholesaler'>
+                                    Mayorista: </p>
+                                <p class='wholesalers-price'>Ver precios según variación</p>
+                            </div>
 
-                    <?php if ($product->is_type('variable')) {
-                        //var_dump($product->get_children()) ?>
-                        <div class="wholesaler-prices">
-                            <p class='wholesaler'>
-                                Mayorista: </p>
-                            <p class='wholesalers-price'>Ver precios según variación</p>
-                        </div>
-                    <?php } ?>
-                    <div class="detail-prices">
-                        <p class="detail">Detalle</p>
-                        <p class="details-price">
-                            <?php if ($product->is_type('simple')) {
-                                echo $product->get_price_html();
-                            } else {
-                                echo "Desde: $" . number_format($product->get_variation_price(), 0, ',', '.');
-                            } ?>
-                        </p>
-                    </div>
+                            <div class="detail-prices">
+                                <p class="detail">Detalle</p>
+                                <p class="details-price">
+
+                                    <?php if ($product->is_type('simple')) {
+                                        echo $product->get_price_html();
+                                    } else {
+                                        echo "Desde: $" . number_format($product->get_variation_price(), 0, ',', '.');
+                                    } ?>
+                                </p>
+                            </div>
+                        <?php }
+                    } ?>
                     <?php if ($product->is_type('simple')) { ?>
+                        <?php echo $product->get_price_html(); ?>
                         <a href="<?php echo $product->add_to_cart_url() ?>"
                            value="<?php echo esc_attr($product->get_id()); ?>"
                            class="ingenium-button ajax_add_to_cart add_to_cart_button"
@@ -140,8 +146,7 @@ function slick_woocommerce_carousel_shortcode($atts)
                             Añadir al carro
                         </a>
                     <?php } else {
-                        //var_dump($product->get_children());
-
+                        echo "Desde: $" . number_format($product->get_variation_price(), 0, ',', '.');
                         echo '<a class="ingenium-button" href="' . $product->get_permalink() . '">Seleccionar Opciones</a>';
                     }
                     ?>
