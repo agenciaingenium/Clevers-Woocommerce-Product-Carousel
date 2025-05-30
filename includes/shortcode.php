@@ -233,26 +233,40 @@ add_shortcode('slick_woocommerce_carousel', 'slick_woocommerce_carousel_shortcod
 
 function get_product_discount_percentage($product_id)
 {
-    // Obtener el producto
     $product = wc_get_product($product_id);
 
-    // Asegurarse de que es un producto válido
     if (!$product) {
         return null;
     }
 
-    // Obtener el precio regular y el precio de oferta
-    $regular_price = $product->get_regular_price();
-    $sale_price = $product->get_sale_price();
+    if ($product->is_type('variable')) {
+        $max_discount = 0;
 
-    // Si no hay precio de oferta, no hay descuento
-    if (empty($sale_price) || empty($regular_price)) {
-        return null;
+        foreach ($product->get_available_variations() as $variation_data) {
+            $variation = wc_get_product($variation_data['variation_id']);
+            if (!$variation) continue;
+
+            $regular_price = (float) $variation->get_regular_price();
+            $sale_price = (float) $variation->get_sale_price();
+
+            if ($regular_price && $sale_price && $regular_price > $sale_price) {
+                $discount = (($regular_price - $sale_price) / $regular_price) * 100;
+                if ($discount > $max_discount) {
+                    $max_discount = $discount;
+                }
+            }
+        }
+
+        return $max_discount > 0 ? round($max_discount) : null;
+    } else {
+        $regular_price = (float) $product->get_regular_price();
+        $sale_price = (float) $product->get_sale_price();
+
+        if ($regular_price && $sale_price && $regular_price > $sale_price) {
+            $discount = (($regular_price - $sale_price) / $regular_price) * 100;
+            return round($discount);
+        }
     }
 
-    // Calcular el porcentaje de descuento
-    $discount_percentage = (($regular_price - $sale_price) / $regular_price) * 100;
-
-    // Redondear a 2 decimales
-    return round($discount_percentage);
+    return null;
 }
