@@ -61,18 +61,33 @@ function slick_woocommerce_carousel_shortcode($atts)
         $args['category'] = array($atts['category']);
     }
 
+    if ($atts['orderBy'])
+
+
+// Mapear orderBy a los valores aceptados por WC_Product_Query
+        $order_by_map = array(
+            'price'     => 'price',
+            'rand'      => 'rand',
+            'date'      => 'date',
+            'modified'  => 'modified',
+            'title'     => 'title',
+            'popularity'=> 'popularity', // requiere integración adicional
+            'rating'    => 'rating',     // requiere integración adicional
+        );
+
+    $args['orderby'] = isset($order_by_map[$atts['orderBy']]) ? $order_by_map[$atts['orderBy']] : 'date';
+    $args['order'] = in_array(strtolower($atts['direction']), ['asc', 'desc']) ? strtoupper($atts['direction']) : 'DESC';
 
     $query = new WC_Product_Query($args);
     $products = $query->get_products();
 
-    $ordered = wc_products_array_orderby($products, $atts['orderBy'], $atts['direction']);
     ?>
     <div class="slick-carousel ingenium-carousel">
         <?php
         // Comprobar si hay productos
         if (!empty($products)) {
             // Hay productos, puedes trabajar con ellos
-            foreach ($ordered
+            foreach ($products
 
                      as $product) {
 
