@@ -9,7 +9,7 @@ function imprimir_estilos_personalizados()
     <style>
         :root {
             --ingenium-primary: <?php echo esc_attr($colorPrimary); ?>;
-            --ingenium-seconday: <?php echo esc_attr($colorSecondary); ?>; /* Verde */
+            --ingenium-secondary: <?php echo esc_attr($colorSecondary); ?>; /* Verde */
             --ingenium-background: <?php echo esc_attr($colorBackground); ?>; /* Gris claro */
         }
     </style>

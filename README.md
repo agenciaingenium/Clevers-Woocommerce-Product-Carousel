@@ -1,2 +1,2 @@
-# Woocommerce Product Carousel
+# Clevers Carousel
  

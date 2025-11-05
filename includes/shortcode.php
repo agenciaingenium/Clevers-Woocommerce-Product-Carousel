@@ -2,16 +2,8 @@
 // Enqueue Bootstrap CSS y JS
 function enqueue_slick_scripts()
 {
-    // Agrega Slick CSS
-    wp_enqueue_style('slick-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css');
-    wp_enqueue_style('slick-theme-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css');
-
-    wp_enqueue_style('custom-style', plugin_dir_url(__FILE__) . '../css/style.css', array('slick-css', 'slick-theme-css'));
-
-
-    // Agrega jQuery y Slick JS
-    wp_enqueue_script('jquery');
-    wp_enqueue_script('slick-js', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', array('jquery'), null, true);
+    // Deprecated: assets are registered and enqueued by the new Clevers Slider renderer.
+    return;
 }
 
 function enqueue_woocommerce_script()
@@ -32,6 +24,7 @@ function slick_woocommerce_carousel_shortcode($atts)
     // Definir los atributos y sus valores predeterminados
     $atts = shortcode_atts(
         array(
+            'id' => 0,
             'num_per_slide' => 3,  // Número de productos por slide
             'limit' => 8,          // Límite total de productos a mostrar
             'orderBy' => 'price',
@@ -44,6 +37,12 @@ function slick_woocommerce_carousel_shortcode($atts)
         $atts,
         'slick_woocommerce_carousel'
     );
+
+    // Delegar al nuevo renderizador si se pasa un ID de slider CPT
+    $id = intval($atts['id']);
+    if ($id > 0 && function_exists('clv_render_slider')) {
+        return clv_render_slider($id);
+    }
 
     ob_start();
 
