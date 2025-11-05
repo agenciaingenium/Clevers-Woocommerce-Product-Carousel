@@ -3,7 +3,7 @@
  * Plugin Name: Clevers Product Slider
  * Description: CPT "Product Slider" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
  * Author: Clevers Devs
- * Version: 0.1.0
+ * Version: 0.2.0
  * Text Domain: clevers-carousel
  */
 
