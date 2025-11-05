@@ -1,133 +1,125 @@
-# Clevers Woocommerce Product Slider
+# 🧩 Clevers Product Slider
 
-Contributors: clevers.dev
-Donate link: https://clevers.dev
-Tags: woocommerce, carousel, slider, products, ecommerce, slick, responsive
-Requires at least: 5.8
-Tested up to: 6.7
-Stable tag: 0.2.0
-Requires PHP: 7.4
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+> **Plugin de WordPress + WooCommerce**  
+> Crea sliders de productos profesionales, totalmente personalizables y con presets listos para usar.  
+> Desarrollado por [Clevers Devs](https://clevers.dev)
 
-Crea sliders profesionales de productos WooCommerce con presets personalizables, colores por carrusel y diseño responsive basado en Slick.js.
+![WordPress Tested](https://img.shields.io/badge/Tested%20up%20to-6.7-blue?logo=wordpress)
+![WooCommerce Compatible](https://img.shields.io/badge/WooCommerce-Compatible-success?logo=woocommerce)
+![License](https://img.shields.io/badge/license-GPLv2-orange)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 
-== Description ==
+---
 
-**Clevers Product Slider** te permite crear y mostrar carruseles de productos de WooCommerce completamente personalizables desde el panel de administración.
+## ✨ Características
 
-- Diseños prediseñados ("presets") listos para usar.  
-- Personalización de colores, botones, fondo y texto por carrusel.  
-- Filtros de productos: destacados, en oferta, en stock, categorías específicas.  
-- Configuración de slides, autoplay, dots y flechas.  
-- Cache inteligente y variables CSS dinámicas para mejor rendimiento.  
-- Soporte para plantillas sobreescribibles en el tema (como WooCommerce).
+- 🎨 **4 presets** visuales (personalizables o extendibles).  
+- 💅 **Colores configurables** por carrusel (botón, texto, burbuja, borde, fondo, etc.).  
+- 🛒 **Filtros dinámicos:** productos destacados, en oferta o por categorías.  
+- ⚙️ **Opciones visuales:** autoplay, velocidad, número de slides, flechas, dots.  
+- 🚀 **Caché inteligente y variables CSS** por slider.  
+- 💾 **Plantillas sobreescribibles** en el tema (estilo WooCommerce).  
+- 🧩 **Totalmente responsive** gracias a Slick.js.  
 
-### Características principales
+---
 
-✅ **Presets personalizables:** 4 diseños base, fácilmente extendibles.  
-🎨 **Colores dinámicos:** define colores por slider (primary, secondary, botones, burbujas, etc.).  
-🛒 **Compatibilidad completa con WooCommerce.**  
-⚙️ **Opciones visuales:** autoplay, velocidad, número de slides visibles, flechas y dots.  
-🚀 **Plantillas sobreescribibles:** copia `templates/sliders/slider-1.php` o `templates/cards/card-1.php` en tu tema bajo `/clevers-carousel/` para personalizar el HTML.  
-🧠 **Sistema de caché avanzado:** evita consultas repetitivas y mejora la velocidad.
+## 📦 Instalación
 
-== Installation ==
+### Desde WordPress
+1. Sube el archivo `.zip` desde “Plugins → Añadir nuevo → Subir plugin”.
+2. Activa el plugin desde el panel de administración.
+3. Crea un nuevo **Product Slider** desde el menú “Product Sliders”.
+4. Inserta el shortcode donde quieras:
 
-1. Sube la carpeta del plugin al directorio `/wp-content/plugins/`, o instálalo directamente desde el repositorio de WordPress.  
-2. Activa el plugin desde el menú "Plugins" en WordPress.  
-3. Crea un nuevo **Product Slider** desde el menú “Product Sliders” en el panel de administración.  
-4. Configura su diseño, colores y filtros.  
-5. Inserta el slider en cualquier página o plantilla usando el shortcode:
-
-```
+```php
 [clevers_slider id="123"]
 ```
 
-*(Reemplaza `123` por el ID de tu slider.)*
+---
 
-== Frequently Asked Questions ==
+## ⚙️ Uso
 
-= ¿Puedo usarlo sin WooCommerce? =
-No. El plugin requiere WooCommerce activo para poder obtener los productos.
+Cada carrusel permite configurar:
+- Diseño (*Preset 1-4*)
+- Número de slides visibles
+- Autoplay, dots y arrows
+- Filtros de productos (categorías, destacados, ofertas)
+- Colores personalizados (variables CSS)
 
-= ¿Cómo cambio el diseño de las tarjetas? =
-Copia el archivo desde:
-```
-wp-content/plugins/clevers-product-slider/templates/cards/card-1.php
-```
-a:
-```
-wp-content/themes/tu-tema/clevers-carousel/cards/card-1.php
-```
-y edítalo allí.
-
-= ¿Cómo personalizo los colores? =
-Cada slider tiene sus propios campos de color en el editor. También puedes usar CSS variables:
+### 🎨 Ejemplo de personalización vía CSS
 
 ```css
 #clevers-slider-123 {
   --clevers-primary: #e63946;
   --clevers-secondary: #1d3557;
+  --clevers-button-background: #457b9d;
+  --clevers-button-text: #ffffff;
 }
 ```
 
-== Screenshots ==
-1. Panel de administración con los campos de configuración del slider.
-2. Ejemplo de slider de productos en el frontend.
-3. Edición de colores por carrusel.
-4. Diferentes presets de tarjetas.
+---
 
-== Changelog ==
+## 🧠 Sobrescribir plantillas
 
-= 0.2.0 =
-* Añadido sistema de colores por slider (CSS variables dinámicas).
-* Mejorado el render con caché inteligente.
-* Añadido soporte para sobrescribir plantillas en el tema.
-* Refactor general del código.
+Para personalizar la vista sin tocar el plugin:
 
-= 0.1.0 =
-* Versión inicial: creación de sliders de productos básicos.
+Copia el archivo desde:
+```
+wp-content/plugins/clevers-product-slider/templates/cards/card-1.php
+```
 
-== Upgrade Notice ==
+a tu tema en:
+```
+wp-content/themes/tu-tema/clevers-carousel/cards/card-1.php
+```
 
-= 0.2.0 =
-Esta actualización introduce variables CSS por slider. Asegúrate de limpiar la caché del navegador tras actualizar.
-
-== License ==
-
-Este plugin es software libre, licenciado bajo la GPLv2 o posterior.
+El sistema cargará automáticamente tu versión.
 
 ---
 
-## 💡 Recomendaciones para publicar
+## 📷 Capturas
 
-1. **Nombre del archivo principal:**  
-   Debe coincidir con el *slug* que usarás en WordPress.org, ej. `clevers-product-slider.php`.
-
-2. **Text Domain:**  
-   Ya está correcto: `clevers-carousel`.
-
-3. **Dominio del plugin:**  
-   Carpeta recomendada: `clevers-product-slider`.
-
-4. **Internacionalización (i18n):**  
-   Crea él `.pot` con:
-   ```bash
-   wp i18n make-pot . languages/clevers-carousel.pot
-   ```
-
-5. **Validación:**  
-   Usa el [Plugin Check](https://wordpress.org/plugins/plugin-check/) para verificar estándares.
-
-6. **Commit inicial (SVN o GitHub):**  
-   ```bash
-   svn mkdir https://plugins.svn.wordpress.org/clevers-product-slider/trunk
-   svn mkdir https://plugins.svn.wordpress.org/clevers-product-slider/tags/0.2.0
-   svn add clevers-product-slider.php assets templates languages readme.txt
-   svn ci -m "Initial commit version 0.2.0"
-   ```
+1. Configuración del slider en el panel de administración.  
+2. Slider de productos en frontend.  
+3. Colores configurables por carrusel.  
+4. Ejemplos de presets personalizados.
 
 ---
 
-¿Quieres que te genere también un **`clevers-carousel.pot`** con las cadenas listas para traducción y el comando para automatizarlo (WP-CLI o Poedit)? Puedo dejarlo preparado.
+## 🧩 Requisitos
+
+- WordPress 5.8+
+- WooCommerce 6.0+
+- PHP 7.4 o superior
+
+---
+
+## 🧱 Estructura del plugin
+
+```
+clevers-product-slider/
+├── clevers-product-slider.php
+├── assets/
+│   ├── slider.css
+│   ├── slider.js
+├── templates/
+│   ├── sliders/
+│   └── cards/
+└── languages/
+```
+
+---
+
+## 📜 Licencia
+
+GPLv2 o posterior  
+https://www.gnu.org/licenses/gpl-2.0.html
+
+---
+
+## 🧩 Créditos
+
+Desarrollado con ❤️ por [Clevers Devs](https://clevers.dev)
+
+¿Quieres contribuir o sugerir mejoras?  
+Abre un issue o PR en [github.com/cleversdevs/clevers-product-slider](https://github.com/cleversdevs/clevers-product-slider)
