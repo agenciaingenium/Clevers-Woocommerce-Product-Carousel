@@ -54,11 +54,11 @@ $discount = clv_discount_percentage($product);
          class="clevers-button ajax_add_to_cart add_to_cart_button"
          data-product_id="<?php echo esc_attr($product->get_id()); ?>"
          data-product_sku="<?php echo esc_attr($product->get_sku()); ?>">
-        <?php esc_html_e('Añadir al carrito', 'clevers-carousel'); ?>
+        <?php esc_html_e('Añadir al carrito', 'clevers-product-carousel'); ?>
       </a>
     <?php else: ?>
       <a href="<?php echo esc_url($product->get_permalink()); ?>" class="clevers-button">
-        <?php esc_html_e('Seleccionar opciones', 'clevers-carousel'); ?>
+        <?php esc_html_e('Seleccionar opciones', 'clevers-product-carousel'); ?>
       </a>
     <?php endif; ?>
   </div>

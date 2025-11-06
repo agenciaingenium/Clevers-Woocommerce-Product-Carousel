@@ -70,7 +70,7 @@ wp-content/plugins/clevers-product-slider/templates/cards/card-1.php
 
 a tu tema en:
 ```
-wp-content/themes/tu-tema/clevers-carousel/cards/card-1.php
+wp-content/themes/tu-tema/clevers-product-carousel/cards/card-1.php
 ```
 
 El sistema cargará automáticamente tu versión.
@@ -101,7 +101,7 @@ clevers-product-slider/
 ├── clevers-product-slider.php
 ├── assets/
 │   ├── slider.css
-│   ├── slider.js
+│   ├── carousel.js
 ├── templates/
 │   ├── sliders/
 │   └── cards/

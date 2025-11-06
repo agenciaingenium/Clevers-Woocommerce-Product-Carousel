@@ -27,7 +27,7 @@
     color: var(--clevers-primary);
 }
 
-.clevers-carousel .slick-slide {
+.clevers-product-carousel .slick-slide {
     margin: 10px;
     min-height: 450px;
     padding: 10px 0;
@@ -210,7 +210,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
         min-height: 400px !important;
     }
 
-    .clevers-carousel {
+    .clevers-product-carousel {
         max-width: 90%;
         min-width: 90%;
         margin: 0 auto;
@@ -222,11 +222,11 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     }
 }
 
-.clevers-carousel.preset-2 .slick-slide {
+.clevers-product-carousel.preset-2 .slick-slide {
     padding: 12px;
 }
 
-.clevers-carousel.preset-2 .clevers-product.card-2 {
+.clevers-product-carousel.preset-2 .clevers-product.card-2 {
     background: var(--clevers-card-bg);
     border: 1px solid #e5e7eb;
     border-radius: 10px;
@@ -240,12 +240,12 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     align-items: center;
 }
 
-.clevers-carousel.preset-2 .product-media {
+.clevers-product-carousel.preset-2 .product-media {
     position: relative;
     width: 100%;
 }
 
-.clevers-carousel.preset-2 .product-thumb img {
+.clevers-product-carousel.preset-2 .product-thumb img {
     width: 100%;
     height: auto;
     display: block;
@@ -253,7 +253,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 }
 
 /* Badge circular negro con texto amarillo (40%) */
-.clevers-carousel.preset-2 .clv-badge-round {
+.clevers-product-carousel.preset-2 .clv-badge-round {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -271,7 +271,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 }
 
 /* Título en mayúsculas */
-.clevers-carousel.preset-2 .product-title {
+.clevers-product-carousel.preset-2 .product-title {
     display: block;
     font-weight: 700;
     font-size: 14px;
@@ -281,24 +281,24 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 }
 
 /* Precio */
-.clevers-carousel.preset-2 .price-area {
+.clevers-product-carousel.preset-2 .price-area {
     font-size: 15px;
 }
 
-.clevers-carousel.preset-2 .price del {
+.clevers-product-carousel.preset-2 .price del {
     color: #888;
     font-weight: 600;
     margin-right: 6px;
 }
 
-.clevers-carousel.preset-2 .price ins {
+.clevers-product-carousel.preset-2 .price ins {
     color: var(--clevers-text);
     font-weight: 800;
     text-decoration: none;
 }
 
 /* Botón verde */
-.clevers-carousel.preset-2 .clevers-button {
+.clevers-product-carousel.preset-2 .clevers-button {
     background: var(--clevers-primary);
     color: #fff;
     padding: 10px 16px;
@@ -308,14 +308,14 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     transition: background-color .18s ease;
 }
 
-.clevers-carousel.preset-2 .clevers-button:hover,
-.clevers-carousel.preset-2 .clevers-button:focus {
+.clevers-product-carousel.preset-2 .clevers-button:hover,
+.clevers-product-carousel.preset-2 .clevers-button:focus {
     background: var(--clevers-secondary);
     color: #fff;
 }
 
 /* Slide central destacado (requiere centerMode en Slick) */
-.clevers-carousel.preset-2 .slick-center .clevers-product.card-2 {
+.clevers-product-carousel.preset-2 .slick-center .clevers-product.card-2 {
     outline: 3px solid #2b6cb0; /* azul como en la imagen */
     outline-offset: 2px;
     transform: translateY(-2px);
@@ -323,7 +323,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 }
 
 @media (max-width: 480px) {
-    .clevers-carousel.preset-2 .clevers-product.card-2 {
+    .clevers-product-carousel.preset-2 .clevers-product.card-2 {
         min-height: 320px;
     }
 }

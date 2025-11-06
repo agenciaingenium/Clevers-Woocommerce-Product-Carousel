@@ -5,7 +5,7 @@
  * Description: CPT "Product Carousel" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
  * Author: Clevers Devs
  * Author URI: https://clevers.dev
- * Version: 0.2.3
+ * Version: 0.2.4
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Tested up to: 6.7
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 // -----------------------------------------------------------------------------
 //  Constantes
 // -----------------------------------------------------------------------------
-define('CLV_SLUG', 'clevers_slider');
+define('CLV_SLUG', 'clevers_carousel');
 define('CLV_DIR', plugin_dir_path(__FILE__));
 define('CLV_URL', plugin_dir_url(__FILE__));
 
@@ -29,11 +29,11 @@ define('CLV_URL', plugin_dir_url(__FILE__));
 //  i18n
 // -----------------------------------------------------------------------------
 add_action('init', function () {
-    load_plugin_textdomain('clevers-carousel', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    load_plugin_textdomain('clevers-product-carousel', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
 
 // -----------------------------------------------------------------------------
-//  1) CPT: clevers_slider
+//  1) CPT: clevers_carousel
 // -----------------------------------------------------------------------------
 add_action('init', function () {
     wp_register_style('slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css', [], '1.8.1');
@@ -41,22 +41,22 @@ add_action('init', function () {
     wp_register_script('slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', ['jquery'], '1.8.1', true);
 
     // Tus assets locales con busting por filemtime
-    $css = CLV_DIR . 'assets/slider.css';
-    $js = CLV_DIR . 'assets/slider.js';
+    $css = CLV_DIR . 'assets/carousel.css';
+    $js = CLV_DIR . 'assets/carousel.js';
     $css_ver = file_exists($css) ? filemtime($css) : '0.1.0';
     $js_ver = file_exists($js) ? filemtime($js) : '0.1.0';
 
-    wp_register_style('clv-slider', CLV_URL . 'assets/slider.css', ['slick', 'slick-theme'], $css_ver);
-    wp_register_script('clv-slider', CLV_URL . 'assets/slider.js', ['slick'], $js_ver, true);
+    wp_register_style('clv-carousel', CLV_URL . 'assets/carousel.css', ['slick', 'slick-theme'], $css_ver);
+    wp_register_script('clv-carousel', CLV_URL . 'assets/carousel.js', ['slick'], $js_ver, true);
     $labels = [
-            'name' => __('Product Sliders', 'clevers-carousel'),
-            'singular_name' => __('Product Slider', 'clevers-carousel'),
-            'add_new' => __('Add New', 'clevers-carousel'),
-            'add_new_item' => __('Add New Slider', 'clevers-carousel'),
-            'edit_item' => __('Edit Slider', 'clevers-carousel'),
-            'new_item' => __('New Slider', 'clevers-carousel'),
-            'all_items' => __('All Sliders', 'clevers-carousel'),
-            'menu_name' => __('Product Sliders', 'clevers-carousel'),
+            'name' => __('Product Carousels', 'clevers-product-carousel'),
+            'singular_name' => __('Product Carousel', 'clevers-product-carousel'),
+            'add_new' => __('Add New', 'clevers-product-carousel'),
+            'add_new_item' => __('Add New Carousel', 'clevers-product-carousel'),
+            'edit_item' => __('Edit Carousel', 'clevers-product-carousel'),
+            'new_item' => __('New Carousel', 'clevers-product-carousel'),
+            'all_items' => __('All Carousels', 'clevers-product-carousel'),
+            'menu_name' => __('Product Carousels', 'clevers-product-carousel'),
     ];
 
     $args = [
@@ -76,13 +76,13 @@ add_action('init', function () {
 //  2) Metabox básico (preset + query + opciones slick)
 // -----------------------------------------------------------------------------
 add_action('add_meta_boxes', function () {
-    add_meta_box('clv_slider_settings', __('Slider Settings', 'clevers-carousel'), 'clv_slider_settings_mb', CLV_SLUG, 'normal', 'high');
+    add_meta_box('clv_carousel_settings', __('Carousel Settings', 'clevers-product-carousel'), 'clv_carousel_settings_mb', CLV_SLUG, 'normal', 'high');
 });
 
-function clv_slider_settings_mb($post)
+function clv_carousel_settings_mb($post)
 {
-    $meta = clv_get_slider_meta($post->ID);
-    wp_nonce_field('clv_save_slider', 'clv_slider_nonce');
+    $meta = clv_get_carousel_meta($post->ID);
+    wp_nonce_field('clv_save_carousel', 'clv_carousel_nonce');
 
     $preset = intval($meta['preset'] ?? 1);
     $limit = intval($meta['limit'] ?? 8);
@@ -109,7 +109,7 @@ function clv_slider_settings_mb($post)
             margin-bottom: 4px
         }</style>
     <div class="clv-field">
-        <label for="clv[preset]"><?php _e('Preset / Design', 'clevers-carousel'); ?></label>
+        <label for="clv[preset]"><?php _e('Preset / Design', 'clevers-product-carousel'); ?></label>
         <select name="clv[preset]">
             <option value="1" <?php selected($preset, 1); ?>>Preset 1</option>
             <option value="2" <?php selected($preset, 2); ?>>Preset 2</option>
@@ -119,12 +119,12 @@ function clv_slider_settings_mb($post)
     </div>
 
     <div class="clv-field">
-        <label><?php _e('Limit', 'clevers-carousel'); ?></label>
+        <label><?php _e('Limit', 'clevers-product-carousel'); ?></label>
         <input type="number" min="1" name="clv[limit]" value="<?php echo esc_attr($limit); ?>"/>
     </div>
 
     <div class="clv-field">
-        <label><?php _e('Order By / Order', 'clevers-carousel'); ?></label>
+        <label><?php _e('Order By / Order', 'clevers-product-carousel'); ?></label>
         <select name="clv[orderby]">
             <?php foreach (['date', 'modified', 'title', 'price', 'rand', 'popularity', 'rating'] as $opt): ?>
                 <option value="<?php echo esc_attr($opt); ?>" <?php selected($orderby, $opt); ?>><?php echo esc_html(ucfirst($opt)); ?></option>
@@ -137,49 +137,49 @@ function clv_slider_settings_mb($post)
     </div>
 
     <div class="clv-field">
-        <label><?php _e('Product Categories (slugs, comma separated)', 'clevers-carousel'); ?></label>
+        <label><?php _e('Product Categories (slugs, comma separated)', 'clevers-product-carousel'); ?></label>
         <input type="text" name="clv[categories_csv]" value="<?php echo esc_attr(implode(',', $categories)); ?>"
                placeholder="ropa,ofertas"/>
-        <small><?php _e('Usa slugs de product_cat (no categorías de posts).', 'clevers-carousel'); ?></small>
+        <small><?php _e('Usa slugs de product_cat (no categorías de posts).', 'clevers-product-carousel'); ?></small>
     </div>
 
     <div class="clv-field">
-        <label><?php _e('Filters', 'clevers-carousel'); ?></label>
+        <label><?php _e('Filters', 'clevers-product-carousel'); ?></label>
         <label><input type="checkbox"
-                      name="clv[on_sale]" <?php checked($on_sale); ?> /> <?php _e('On Sale', 'clevers-carousel'); ?>
+                      name="clv[on_sale]" <?php checked($on_sale); ?> /> <?php _e('On Sale', 'clevers-product-carousel'); ?>
         </label>
         <label><input type="checkbox"
-                      name="clv[on_featured]" <?php checked($on_featured); ?> /> <?php _e('Featured', 'clevers-carousel'); ?>
+                      name="clv[on_featured]" <?php checked($on_featured); ?> /> <?php _e('Featured', 'clevers-product-carousel'); ?>
         </label>
         <label><input type="checkbox"
-                      name="clv[instock_only]" <?php checked($instock_only); ?> /> <?php _e('In Stock Only', 'clevers-carousel'); ?>
+                      name="clv[instock_only]" <?php checked($instock_only); ?> /> <?php _e('In Stock Only', 'clevers-product-carousel'); ?>
         </label>
     </div>
 
     <hr/>
-    <h3><?php _e('Carousel Options', 'clevers-carousel'); ?></h3>
+    <h3><?php _e('Carousel Options', 'clevers-product-carousel'); ?></h3>
     <div class="clv-field">
-        <label><?php _e('Slides To Show', 'clevers-carousel'); ?></label>
+        <label><?php _e('Slides To Show', 'clevers-product-carousel'); ?></label>
         <input type="number" min="1" name="clv[slidesToShow]" value="<?php echo esc_attr($slidesToShow); ?>"/>
     </div>
     <div class="clv-field">
         <label><input type="checkbox"
-                      name="clv[autoplay]" <?php checked($autoplay); ?> /> <?php _e('Autoplay', 'clevers-carousel'); ?>
+                      name="clv[autoplay]" <?php checked($autoplay); ?> /> <?php _e('Autoplay', 'clevers-product-carousel'); ?>
         </label>
     </div>
     <div class="clv-field">
-        <label><?php _e('Autoplay Speed (ms)', 'clevers-carousel'); ?></label>
+        <label><?php _e('Autoplay Speed (ms)', 'clevers-product-carousel'); ?></label>
         <input type="number" min="500" step="100" name="clv[autoplayMs]" value="<?php echo esc_attr($autoplayMs); ?>"/>
     </div>
     <div class="clv-field">
         <label><input type="checkbox"
-                      name="clv[dots]" <?php checked($dots); ?> /> <?php _e('Dots', 'clevers-carousel'); ?></label>
+                      name="clv[dots]" <?php checked($dots); ?> /> <?php _e('Dots', 'clevers-product-carousel'); ?></label>
         <label><input type="checkbox"
-                      name="clv[arrows]" <?php checked($arrows); ?> /> <?php _e('Arrows', 'clevers-carousel'); ?>
+                      name="clv[arrows]" <?php checked($arrows); ?> /> <?php _e('Arrows', 'clevers-product-carousel'); ?>
         </label>
     </div>
     <?php
-    // En tu metabox (clv_slider_settings_mb)
+    // En tu metabox (clv_carousel_settings_mb)
     $color_primary = esc_attr($meta['color_primary'] ?? '');
     $color_primary2 = esc_attr($meta['color_primary2'] ?? '');
     $color_secondary = esc_attr($meta['color_secondary'] ?? '');
@@ -238,7 +238,7 @@ add_action('save_post_' . CLV_SLUG, function ($post_id, $post, $update) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) return;
     if ($post->post_type !== CLV_SLUG) return;
-    if (!isset($_POST['clv_slider_nonce']) || !wp_verify_nonce($_POST['clv_slider_nonce'], 'clv_save_slider')) return;
+    if (!isset($_POST['clv_carousel_nonce']) || !wp_verify_nonce($_POST['clv_carousel_nonce'], 'clv_save_carousel')) return;
     if (!current_user_can('edit_post', $post_id)) return;
 
     $in = $_POST['clv'] ?? [];
@@ -279,7 +279,7 @@ add_action('save_post_' . CLV_SLUG, function ($post_id, $post, $update) {
     update_post_meta($post_id, '_clv_cache_version', $ver + 1);
 }, 10, 3);
 
-function clv_get_slider_meta($id)
+function clv_get_carousel_meta($id)
 {
     return (array)get_post_meta($id, '_clv_settings', true);
 }
@@ -287,9 +287,9 @@ function clv_get_slider_meta($id)
 // -----------------------------------------------------------------------------
 //  3) Helpers: Query + Settings
 // -----------------------------------------------------------------------------
-function clv_build_query_args($slider_id)
+function clv_build_query_args($carousel_id)
 {
-    $meta = clv_get_slider_meta($slider_id);
+    $meta = clv_get_carousel_meta($carousel_id);
 
     $orderby = $meta['orderby'] ?? 'date';
     $args = [
@@ -329,12 +329,12 @@ function clv_build_query_args($slider_id)
         $args['stock_status'] = 'instock';
     }
 
-    return apply_filters('clevers_slider/query_args', $args, $slider_id, $meta);
+    return apply_filters('clevers_carousel/query_args', $args, $carousel_id, $meta);
 }
 
-function clv_get_settings($slider_id)
+function clv_get_settings($carousel_id)
 {
-    $meta = clv_get_slider_meta($slider_id);
+    $meta = clv_get_carousel_meta($carousel_id);
     $defaults = [
             'preset' => 1,
             'slidesToShow' => 4,
@@ -350,32 +350,32 @@ function clv_get_settings($slider_id)
         $settings['color_secondary'] = $settings['color_primary2'];
     }
 
-    return apply_filters('clevers_slider/settings', $settings, $slider_id);
+    return apply_filters('clevers_carousel/settings', $settings, $carousel_id);
 }
 
 
 // -----------------------------------------------------------------------------
 //  4) Render + Template loader
 // -----------------------------------------------------------------------------
-function clv_render_slider($slider_id)
+function clv_render_carousel($carousel_id)
 {
     if (!class_exists('WooCommerce')) return '';
 
-    $slider = get_post($slider_id);
-    if (!$slider || $slider->post_type !== CLV_SLUG) return '';
+    $carousel = get_post($carousel_id);
+    if (!$carousel || $carousel->post_type !== CLV_SLUG) return '';
 
     // 1) Args + settings
-    $args = clv_build_query_args($slider_id);
-    $settings = clv_get_settings($slider_id);
+    $args = clv_build_query_args($carousel_id);
+    $settings = clv_get_settings($carousel_id);
 
     // 2) ENCOLAR SIEMPRE (antes del cache return)
     wp_enqueue_style('slick');
     wp_enqueue_style('slick-theme');
-    wp_enqueue_style('clv-slider');
+    wp_enqueue_style('clv-carousel');
     wp_enqueue_script('slick');
-    wp_enqueue_script('clv-slider');
+    wp_enqueue_script('clv-carousel');
 
-    // 3) Variables CSS por slider (antes del cache return)
+    // 3) Variables CSS por carousel (antes del cache return)
     $vars = [];
     if (!empty($settings['color_primary'])) $vars[] = '--clevers-primary:' . $settings['color_primary'] . ';';
     if (!empty($settings['color_secondary'])) $vars[] = '--clevers-secondary:' . $settings['color_secondary'] . ';';
@@ -389,14 +389,14 @@ function clv_render_slider($slider_id)
     if(!empty($settings['button_text'])) $vars[] = '--clevers-button-text:' . $settings['button_text'] . ';';
 
     if ($vars) {
-        $inline = '#clevers-slider-' . (int)$slider_id . '{' . implode('', $vars) . '}';
-        wp_add_inline_style('clv-slider', $inline);
+        $inline = '#clevers-product-carousel-' . (int)$carousel_id . '{' . implode('', $vars) . '}';
+        wp_add_inline_style('clv-carousel', $inline);
     }
 
     // 4) Cache key (después de tener settings definitivos)
-    $ver = (int)get_post_meta($slider_id, '_clv_cache_version', true);
+    $ver = (int)get_post_meta($carousel_id, '_clv_cache_version', true);
     $bump = (int)get_option('clv_global_cache_bump', 0);
-    $cache_key = 'clv_slider_' . $slider_id . '_v' . $ver . '_g' . $bump . '_' .
+    $cache_key = 'clv_carousel_' . $carousel_id . '_v' . $ver . '_g' . $bump . '_' .
             md5(wp_json_encode($args) . '|' . wp_json_encode($settings));
 
     // 5) Si hay HTML cacheado, DEVUÉLVELO (assets/vars ya quedaron encolados arriba)
@@ -409,9 +409,9 @@ function clv_render_slider($slider_id)
     $products = (new WC_Product_Query($args))->get_products();
 
     ob_start();
-    do_action('clevers_slider/before', $slider_id, $settings);
-    include clv_locate_template('sliders/slider-' . (int)($settings['preset'] ?? 1) . '.php');
-    do_action('clevers_slider/after', $slider_id, $settings);
+    do_action('clevers_carousel/before', $carousel_id, $settings);
+    include clv_locate_template('carousels/carousel-' . (int)($settings['preset'] ?? 1) . '.php');
+    do_action('clevers_carousel/after', $carousel_id, $settings);
     $html = ob_get_clean();
 
     set_transient($cache_key, $html, 10 * MINUTE_IN_SECONDS);
@@ -420,7 +420,7 @@ function clv_render_slider($slider_id)
 
 function clv_locate_template($rel_path)
 {
-    $theme_path = 'clevers-carousel/' . ltrim($rel_path, '/');
+    $theme_path = 'clevers-product-carousel/' . ltrim($rel_path, '/');
     $tpl = locate_template($theme_path);
     if ($tpl) return $tpl;
     return CLV_DIR . 'templates/' . $rel_path;
@@ -429,9 +429,9 @@ function clv_locate_template($rel_path)
 // -----------------------------------------------------------------------------
 //  5) Shortcode
 // -----------------------------------------------------------------------------
-add_shortcode('clevers_slider', function ($atts) {
+add_shortcode('clevers_carousel', function ($atts) {
     $atts = shortcode_atts(['id' => 0], $atts);
-    return clv_render_slider(intval($atts['id']));
+    return clv_render_carousel(intval($atts['id']));
 });
 
 // -----------------------------------------------------------------------------

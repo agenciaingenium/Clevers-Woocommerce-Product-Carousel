@@ -1,6 +1,6 @@
 (function($){
   function initCleversSliders(ctx){
-    var $wraps = $('.clevers-carousel .slick-carousel', ctx || document);
+    var $wraps = $('.clevers-product-carousel .slick-carousel', ctx || document);
     $wraps.each(function(){
       var $el = $(this);
       if ($el.hasClass('slick-initialized')) return;
