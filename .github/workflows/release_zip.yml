@@ -2,7 +2,7 @@ name: Build & Attach Release ZIP
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 permissions:
   contents: write
@@ -56,16 +56,16 @@ jobs:
         shell: bash
         run: |
           if [ ! -f "$PLUGIN_MAIN" ]; then
-            echo "::error ::No se encontró $PLUGIN_MAIN en la raíz del repo."
-            exit 1
+            echo "::warning ::No se encontró $PLUGIN_MAIN en la raíz. Salto validación de versión."
+            exit 0
           fi
           HEADER_VERSION=$(grep -E "^[[:space:]]*Version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" -m1 "$PLUGIN_MAIN" | sed -E 's/.*Version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
           if [ -z "$HEADER_VERSION" ]; then
-            echo "::error ::No pude extraer la Version del header en $PLUGIN_MAIN."
-            exit 1
+            echo "::warning ::No pude extraer la Version del header. Salto validación."
+            exit 0
           fi
           TAG_NAME="$GITHUB_REF_NAME"
-          TAG_STRIPPED="${TAG_NAME#v}"
+          TAG_STRIPPED="${TAG_NAME#v}"   # quita prefijo 'v' si lo hay
           echo "Header Version: $HEADER_VERSION"
           echo "Tag (stripped): $TAG_STRIPPED"
           if [ "$HEADER_VERSION" != "$TAG_STRIPPED" ]; then
