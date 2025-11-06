@@ -9,8 +9,8 @@ permissions:
 
 env:
   # 👇 EDITA ESTAS 2 VARIABLES SEGÚN ESTE PLUGIN
-  PLUGIN_SLUG: clevers-product-slider
-  PLUGIN_MAIN: clevers-product-slider.php
+  PLUGIN_SLUG: clevers-product-carousel
+  PLUGIN_MAIN: clevers-product-carousel.php
 
 jobs:
   build:

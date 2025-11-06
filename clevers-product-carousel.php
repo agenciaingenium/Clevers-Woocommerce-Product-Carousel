@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Clevers Product Carousel
  * Plugin URI: https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/
- * Description: CPT "Product Slider" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
+ * Description: CPT "Product Carousel" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
  * Author: Clevers Devs
  * Author URI: https://clevers.dev
- * Version: 0.2.2
+ * Version: 0.2.3
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Tested up to: 6.7
