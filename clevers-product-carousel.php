@@ -5,7 +5,7 @@
  * Description: CPT "Product Carousel" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
  * Author: Clevers Devs
  * Author URI: https://clevers.dev
- * Version: 0.2.4
+ * Version: 0.2.5
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Tested up to: 6.7
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 // -----------------------------------------------------------------------------
 //  Constantes
 // -----------------------------------------------------------------------------
-define('CLV_SLUG', 'clevers_carousel');
+const CLV_SLUG = 'clevers_carousel';
 define('CLV_DIR', plugin_dir_path(__FILE__));
 define('CLV_URL', plugin_dir_url(__FILE__));
 
@@ -70,6 +70,7 @@ add_action('init', function () {
             'map_meta_cap' => true,
     ];
     register_post_type(CLV_SLUG, $args);
+    require_once __DIR__ . '/includes/helpers-discount.php';
 });
 
 // -----------------------------------------------------------------------------
@@ -79,7 +80,7 @@ add_action('add_meta_boxes', function () {
     add_meta_box('clv_carousel_settings', __('Carousel Settings', 'clevers-product-carousel'), 'clv_carousel_settings_mb', CLV_SLUG, 'normal', 'high');
 });
 
-function clv_carousel_settings_mb($post)
+function clv_carousel_settings_mb($post): void
 {
     $meta = clv_get_carousel_meta($post->ID);
     wp_nonce_field('clv_save_carousel', 'clv_carousel_nonce');
@@ -183,7 +184,6 @@ function clv_carousel_settings_mb($post)
     $color_primary = esc_attr($meta['color_primary'] ?? '');
     $color_primary2 = esc_attr($meta['color_primary2'] ?? '');
     $color_secondary = esc_attr($meta['color_secondary'] ?? '');
-    $color_accent = esc_attr($meta['color_accent'] ?? '');
     $color_text = esc_attr($meta['color_text'] ?? '');
     $color_card_bg = esc_attr($meta['color_card_bg'] ?? '');
     $color_border = esc_attr($meta['color_border'] ?? '');
@@ -233,7 +233,7 @@ function clv_carousel_settings_mb($post)
     <?php
 }
 
-add_action('save_post_' . CLV_SLUG, function ($post_id, $post, $update) {
+add_action('save_post_' . CLV_SLUG, function ($post_id, $post) {
     // Bail-outs seguros
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) return;
@@ -279,7 +279,7 @@ add_action('save_post_' . CLV_SLUG, function ($post_id, $post, $update) {
     update_post_meta($post_id, '_clv_cache_version', $ver + 1);
 }, 10, 3);
 
-function clv_get_carousel_meta($id)
+function clv_get_carousel_meta($id): array
 {
     return (array)get_post_meta($id, '_clv_settings', true);
 }
@@ -345,11 +345,6 @@ function clv_get_settings($carousel_id)
     ];
     $settings = wp_parse_args($meta, $defaults);
 
-    // 🔁 Compatibilidad: si existe el campo antiguo, úsalo como secondary si no está seteado
-    if (!empty($settings['color_primary2']) && empty($settings['color_secondary'])) {
-        $settings['color_secondary'] = $settings['color_primary2'];
-    }
-
     return apply_filters('clevers_carousel/settings', $settings, $carousel_id);
 }
 
@@ -368,7 +363,7 @@ function clv_render_carousel($carousel_id)
     $args = clv_build_query_args($carousel_id);
     $settings = clv_get_settings($carousel_id);
 
-    // 2) ENCOLAR SIEMPRE (antes del cache return)
+    // 2) ENCOLAR SIEMPRE (antes del caché return)
     wp_enqueue_style('slick');
     wp_enqueue_style('slick-theme');
     wp_enqueue_style('clv-carousel');
@@ -418,7 +413,7 @@ function clv_render_carousel($carousel_id)
     return $html;
 }
 
-function clv_locate_template($rel_path)
+function clv_locate_template($rel_path): string
 {
     $theme_path = 'clevers-product-carousel/' . ltrim($rel_path, '/');
     $tpl = locate_template($theme_path);
@@ -439,6 +434,7 @@ add_shortcode('clevers_carousel', function ($atts) {
 // -----------------------------------------------------------------------------
 function clv_render_card($product, $settings)
 {
+    $GLOBALS['product'] = $product; // para compatibilidad con plantillas WooCommerce
     $tpl = 'cards/card-' . intval($settings['preset']) . '.php';
     include clv_locate_template($tpl);
 }

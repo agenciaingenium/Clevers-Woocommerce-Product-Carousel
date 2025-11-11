@@ -16,11 +16,7 @@ $regular_price = (float)$product->get_regular_price();
 $sale_price = (float)$product->get_sale_price();
 $regular_price = (float)($product->get_regular_price() ?: 0);
 $sale_price = (float)($product->get_sale_price() ?: 0);
-$discount = null;
-
-if ($regular_price > 0 && $sale_price > 0 && $sale_price < $regular_price) {
-    $discount = round((($regular_price - $sale_price) / $regular_price) * 100);
-}
+$discount = clv_get_discount_percentage($product, 'max'); // o 'min' / 'avg'
 ?>
 <div class="clevers-card preset-1-card" data-product-id="<?php echo esc_attr($product->get_id()); ?>">
     <a href="<?php echo esc_url($permalink); ?>" class="product-thumb">

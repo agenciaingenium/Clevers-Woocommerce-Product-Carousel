@@ -4,7 +4,7 @@ Donate link: https://clevers.dev
 Tags: woocommerce, carousel, carousel, products, ecommerce, slick, responsive
 Requires at least: 5.8
 Tested up to: 6.7
-Stable tag: 0.2.4
+Stable tag: 0.2.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -25,7 +25,7 @@ Crea carousels profesionales de productos WooCommerce con presets personalizable
 ### Características principales
 
 ✅ **Presets personalizables:** 4 diseños base, fácilmente extendibles.
-🎨 **Colores dinámicos:** define colores por carousel (primary, secondary, botones, burbujas, etc).
+🎨 **Colores dinámicos:** define colores por carousel (primary, secondary, botones, burbujas, etc.).
 🛒 **Compatibilidad completa con WooCommerce.**
 ⚙️ **Opciones visuales:** autoplay, velocidad, número de slides visibles, flechas y dots.
 🚀 **Plantillas sobreescribibles:** copia `templates/carousels/carousel-1.php` o `templates/cards/card-1.php` en tu tema bajo `/clevers-product-carousel/` para personalizar el HTML.
