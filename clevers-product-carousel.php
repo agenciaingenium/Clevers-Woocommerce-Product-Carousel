@@ -5,7 +5,7 @@
  * Description: CPT "Product Carousel" + render server-side + sistema de plantillas estilo Woo para carruseles de productos.
  * Author: Clevers Devs
  * Author URI: https://clevers.dev
- Version: 0.2.5
+ * Version: 1.0.0
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Tested up to: 6.7
@@ -115,7 +115,7 @@ function clv_carousel_settings_mb($post): void
             <option value="1" <?php selected($preset, 1); ?>>Preset 1</option>
             <option value="2" <?php selected($preset, 2); ?>>Preset 2</option>
             <option value="3" <?php selected($preset, 3); ?>>Preset 3</option>
-            <option value="4" <?php selected($preset, 4); ?>>Preset 4</option>
+            <!--<option value="4" <?php /*selected($preset, 4); */?>>Preset 4</option>-->
         </select>
     </div>
 

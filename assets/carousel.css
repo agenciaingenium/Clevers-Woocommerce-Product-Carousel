@@ -345,6 +345,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     background: var(--clevers-secondary);
     border: 1px solid var(--clevers-border);
     padding: 10px;
+    text-align:center;
 }
 
 .preset-3-card .product-info a {
