@@ -59,26 +59,35 @@ jobs:
           echo "PWD: $(pwd)"
           echo "PLUGIN_MAIN: ${PLUGIN_MAIN}"
           ls -la
-                       
+
           if [[ ! -f "$PLUGIN_MAIN" ]]; then
             echo "::warning ::No se encontró $PLUGIN_MAIN en la raíz. Salto validación de versión."
             exit 0
           fi
-          
-          HEADER_VERSION=$(grep -E "^[[:space:]]*Version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+" -m1 "$PLUGIN_MAIN" \
-            | sed -E 's/.*Version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/') || true
-          
+
+          # Muestra las primeras líneas para debug si algo falla
+          echo "---- HEAD of $PLUGIN_MAIN ----"
+          head -n 50 "$PLUGIN_MAIN" || true
+          echo "------------------------------"
+
+          # Extrae Version: tolerando '*', '//' y espacios; case-insensitive; primeras 50 líneas
+          HEADER_VERSION=$(
+            head -n 50 "$PLUGIN_MAIN" \
+            | grep -Ei '^[[:space:]]*(\*|//)?[[:space:]]*Version:[[:space:]]*[0-9]+(\.[0-9]+){1,3}' -m1 \
+            | sed -E 's/.*Version:[[:space:]]*([0-9]+(\.[0-9]+){1,3}).*/\1/'
+          ) || true
+
           if [[ -z "${HEADER_VERSION:-}" ]]; then
             echo "::warning ::No pude extraer la Version del header. Salto validación."
             exit 0
           fi
-          
+
           TAG_NAME="${GITHUB_REF_NAME}"
           TAG_STRIPPED="${TAG_NAME#v}"
-          
+
           echo "Header Version: ${HEADER_VERSION}"
           echo "Tag (stripped): ${TAG_STRIPPED}"
-          
+
           if [[ "${HEADER_VERSION}" != "${TAG_STRIPPED}" ]]; then
             echo "::error ::La Version del plugin (${HEADER_VERSION}) no coincide con el tag (${TAG_STRIPPED})."
             exit 1
