@@ -129,10 +129,9 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Zip plugin
+        working-directory: ${{ github.workspace }}
         run: |
-          cd ..
-          zip -r "${GITHUB_WORKSPACE}/dist/${PLUGIN_SLUG}-${{ steps.ver.outputs.version }}.zip" "${GITHUB_WORKSPACE##*/}/${PLUGIN_SLUG}"
-          cd "${GITHUB_WORKSPACE}"
+          zip -r "dist/${PLUGIN_SLUG}-${{ steps.ver.outputs.version }}.zip" "$PLUGIN_SLUG"
           ls -lh dist
 
       - name: Attach ZIP to GitHub Release

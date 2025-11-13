@@ -1,64 +1,80 @@
 <?php
-// bin/bump-version.php
+/**
+ * Pequeño script para hacer bump de versión en:
+ * - clevers-product-carousel.php (header Version)
+ * - readme.txt (Stable tag)
+ *
+ * Uso:
+ *   php bin/bump-version.php 1.0.3
+ */
 
 if ($argc < 2) {
-    fwrite(STDERR, "Uso: php bin/bump-version.php 1.0.2\n");
+    fwrite(STDERR, "Uso: php bin/bump-version.php X.Y.Z\n");
     exit(1);
 }
 
-$version = $argv[1];
+$newVersion = $argv[1];
 
-// Valida formato X.Y.Z
-if (!preg_match('/^\d+\.\d+\.\d+$/', $version)) {
-    fwrite(STDERR, "Formato de versión inválido: {$version}. Usa algo como 1.0.2\n");
+// Validación muy básica X.Y.Z
+if (!preg_match('/^[0-9]+\.[0-9]+\.[0-9]+$/', $newVersion)) {
+    fwrite(STDERR, "Versión inválida: {$newVersion}. Usa formato X.Y.Z\n");
     exit(1);
 }
 
-$files = [
-    'clevers-product-carousel.php',
-    'readme.txt',
+$root = dirname(__DIR__);
+
+// Archivos a modificar
+$targets = [
+    $root . '/clevers-product-carousel.php' => [
+        'label'   => 'Plugin main file',
+        // Matchea líneas tipo: " * Version: 1.0.2"
+        'pattern' => '/^(\s*\*\s*Version:\s*)([0-9]+\.[0-9]+\.[0-9]+)(\s*)$/mi',
+        'replace' => '$1' . $newVersion . '$3',
+    ],
+    $root . '/readme.txt' => [
+        'label'   => 'readme.txt (Stable tag)',
+        // Matchea líneas tipo: "Stable tag: 1.0.2"
+        'pattern' => '/^(Stable tag:\s*)([0-9]+\.[0-9]+\.[0-9]+)(\s*)$/mi',
+        'replace' => '$1' . $newVersion . '$3',
+    ],
 ];
 
-foreach ($files as $file) {
+foreach ($targets as $file => $config) {
     if (!file_exists($file)) {
-        fwrite(STDERR, "Aviso: no encontré {$file}, lo salto.\n");
+        echo "Aviso: archivo no encontrado: {$file}\n";
         continue;
     }
 
     $contents = file_get_contents($file);
     if ($contents === false) {
-        fwrite(STDERR, "Error al leer {$file}\n");
+        echo "Error: no pude leer {$file}\n";
         continue;
     }
 
-    $original = $contents;
+    $newContents = preg_replace(
+        $config['pattern'],
+        $config['replace'],
+        $contents,
+        -1,
+        $count
+    );
 
-    if ($file === 'clevers-product-carousel.php') {
-        // Línea del header: Version: X.Y.Z
-        $contents = preg_replace(
-            '/^(\s*\*\s*Version:\s*)(\d+(\.\d+){1,3})/mi',
-            '$1' . $version,
-            $contents,
-            1
-        );
+    if ($newContents === null) {
+        echo "Error en preg_replace para {$config['label']} ({$file})\n";
+        continue;
     }
 
-    if ($file === 'readme.txt') {
-        // Línea: Stable tag: X.Y.Z
-        $contents = preg_replace(
-            '/^(Stable tag:\s*)(\d+(\.\d+){1,3})/mi',
-            '$1' . $version,
-            $contents,
-            1
-        );
+    if ($count === 0) {
+        echo "No se detectó patrón de versión en {$config['label']} ({$file}), nada cambiado.\n";
+        continue;
     }
 
-    if ($contents !== $original) {
-        file_put_contents($file, $contents);
-        echo "Actualizado {$file} a versión {$version}\n";
-    } else {
-        echo "No se detectó patrón de versión en {$file}, nada cambiado.\n";
+    if (file_put_contents($file, $newContents) === false) {
+        echo "Error escribiendo {$file}\n";
+        continue;
     }
+
+    echo "Actualizado {$config['label']} ({$file}) a versión {$newVersion} ({$count} reemplazo(s)).\n";
 }
 
 echo "Listo. Revisa los cambios con: git diff\n";
