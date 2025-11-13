@@ -12,9 +12,9 @@
              data-dots="<?php echo !empty($settings['dots']) ? 'true' : 'false'; ?>"
              data-arrows="<?php echo !empty($settings['arrows']) ? 'true' : 'false'; ?>"
              data-center="true"> <!-- centro activo para borde/zoom -->
-            <?php foreach ($products as $product): ?>
+            <?php foreach ($products as $clevers_product_carousel_product) : ?>
                 <div class="carousel-item">
-                    <?php clv_render_card($product, $settings); ?>
+                    <?php clevers_product_carousel_render_card($clevers_product_carousel_product, $settings); ?>
                 </div>
             <?php endforeach; ?>
         </div>

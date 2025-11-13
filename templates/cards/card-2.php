@@ -1,38 +1,45 @@
 <?php
-/** @var WC_Product $product */
-/** @var array $settings */
+/** @var WC_Product $clevers_product_carousel_product */
+/** @var array       $settings */
 
-$discount = clv_get_discount_percentage($product, 'max'); // o 'min' / 'avg'
+if ( ! $clevers_product_carousel_product ) {
+    return;
+}
+
+$clevers_product_carousel_discount = clevers_product_carousel_get_discount_percentage( $clevers_product_carousel_product, 'max' ); // 'min' / 'avg' también válidos.
 ?>
 <div class="clevers-product card-2">
     <div class="product-media">
-        <?php if ($discount !== null): ?>
-            <span class="clv-badge-round"><?php echo esc_html($discount); ?>%</span>
+        <?php if ( null !== $clevers_product_carousel_discount ) : ?>
+            <span class="clv-badge-round">
+                <?php echo esc_html( $clevers_product_carousel_discount ); ?>%
+            </span>
         <?php endif; ?>
-        <a href="<?php echo esc_url($product->get_permalink()); ?>" class="product-thumb">
-            <?php echo $product->get_image('woocommerce_thumbnail'); ?>
+
+        <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="product-thumb">
+            <?php echo wp_kses_post( $clevers_product_carousel_product->get_image( 'woocommerce_thumbnail' ) ); ?>
         </a>
     </div>
 
-    <a class="product-title" href="<?php echo esc_url($product->get_permalink()); ?>">
-        <?php echo esc_html(mb_strtoupper($product->get_name())); ?>
+    <a class="product-title" href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>">
+        <?php echo esc_html( mb_strtoupper( $clevers_product_carousel_product->get_name() ) ); ?>
     </a>
 
     <div class="price-area">
-        <?php echo wp_kses_post($product->get_price_html()); ?>
+        <?php echo wp_kses_post( $clevers_product_carousel_product->get_price_html() ); ?>
     </div>
 
     <div class="actions">
-        <?php if ($product->is_type('simple')): ?>
-            <a href="<?php echo esc_url($product->add_to_cart_url()); ?>"
+        <?php if ( $clevers_product_carousel_product->is_type( 'simple' ) ) : ?>
+            <a href="<?php echo esc_url( $clevers_product_carousel_product->add_to_cart_url() ); ?>"
                class="clevers-button ajax_add_to_cart add_to_cart_button"
-               data-product_id="<?php echo esc_attr($product->get_id()); ?>"
-               data-product_sku="<?php echo esc_attr($product->get_sku()); ?>">
-                <?php esc_html_e('Añadir al carrito', 'clevers-product-carousel'); ?>
+               data-product_id="<?php echo esc_attr( $clevers_product_carousel_product->get_id() ); ?>"
+               data-product_sku="<?php echo esc_attr( $clevers_product_carousel_product->get_sku() ); ?>">
+                <?php esc_html_e( 'Añadir al carrito', 'clevers-product-carousel' ); ?>
             </a>
-        <?php else: ?>
-            <a href="<?php echo esc_url($product->get_permalink()); ?>" class="clevers-button">
-                <?php esc_html_e('Seleccionar opciones', 'clevers-product-carousel'); ?>
+        <?php else : ?>
+            <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="clevers-button">
+                <?php esc_html_e( 'Seleccionar opciones', 'clevers-product-carousel' ); ?>
             </a>
         <?php endif; ?>
     </div>

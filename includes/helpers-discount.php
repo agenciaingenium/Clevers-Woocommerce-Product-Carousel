@@ -1,7 +1,7 @@
 <?php
 // inc/helpers-discount.php
 
-if (!function_exists('clv_get_discount_percentage')) {
+if (!function_exists('clevers_product_carousel_get_discount_percentage')) {
     /**
      * Calcula el % de descuento de un producto.
      *
@@ -9,7 +9,7 @@ if (!function_exists('clv_get_discount_percentage')) {
      * @param string     $strategy  'max' | 'min' | 'avg'
      * @return int|null  Porcentaje entero (0-100) o null si no aplica
      */
-    function clv_get_discount_percentage(WC_Product $product, string $strategy = 'max'): ?int
+    function clevers_product_carousel_get_discount_percentage(WC_Product $product, string $strategy = 'max'): ?int
     {
         if (!$product->is_on_sale()) {
             return null;
@@ -69,7 +69,7 @@ if (!function_exists('clv_get_discount_percentage')) {
     }
 }
 
-if (!function_exists('clv_render_discount_badge')) {
+if (!function_exists('clevers_product_carousel_render_discount_badge')) {
     /**
      * Render del badge de descuento (HTML).
      *
@@ -78,9 +78,9 @@ if (!function_exists('clv_render_discount_badge')) {
      * @param string|null $extra_class
      * @return string
      */
-    function clv_render_discount_badge(int $percentage, array $settings = [], ?string $extra_class = null): string
+    function clevers_product_carousel_render_discount_badge(int $percentage, array $settings = [], ?string $extra_class = null): string
     {
-        $classes = ['clv-badge-discount'];
+        $classes = ['clevers_product_carousel-badge-discount'];
         if (!empty($settings['preset'])) {
             $classes[] = 'preset-' . (int) $settings['preset'] . '-badge';
         }

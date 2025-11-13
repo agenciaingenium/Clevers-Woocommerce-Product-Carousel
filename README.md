@@ -49,7 +49,7 @@ Cada carrusel permite configurar:
 ### 🎨 Ejemplo de personalización vía CSS
 
 ```css
-#clevers-slider-123 {
+#clevers-product-carousel-123 {
   --clevers-primary: #e63946;
   --clevers-secondary: #1d3557;
   --clevers-button-background: #457b9d;
