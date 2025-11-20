@@ -8,8 +8,8 @@
     --clevers-border: rgba(0, 0, 0, .12);
     --clevers-bubble-text: white;
     --clevers-bubble-background: #00000;
-    --clevers-button-text : #FFFFFF;
-    --clevers-button-background : #2563eb;
+    --clevers-button-text: #FFFFFF;
+    --clevers-button-background: #2563eb;
 }
 
 .clevers-button:hover,
@@ -328,6 +328,12 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     }
 }
 
+/* GLOBAL PRESET */
+
+.product-info {
+    line-height: 1.15 !important;
+}
+
 /* PRESET 3 */
 .preset-3-card .button {
     padding: 10px 15px !important;
@@ -345,7 +351,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     background: var(--clevers-secondary);
     border: 1px solid var(--clevers-border);
     padding: 10px;
-    text-align:center;
+    text-align: center;
 }
 
 .preset-3-card .product-info a {
@@ -356,6 +362,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 .preset-3-card .product-info .price-area {
     font-size: 15px !important;
     font-weight: 600;
+    margin: 10px 0 !important;
 }
 
 .preset-3-card .product-info .price-area ins {
@@ -366,7 +373,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 .preset-3-card .badge-discount {
     position: absolute;
     right: 20px;
-    top:40px;
+    top: 40px;
     transform: translateY(-50%);
     left: auto;
     background: var(--clevers-bubble-background) !important;
@@ -385,7 +392,103 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     font-size: 12px;
     text-align: center;
 }
+
 .preset-3-card .product-thumb {
     position: relative;
     display: inline-block; /* opcional, pero recomendado */
+}
+
+/* PRESET 4 */
+
+/* La card solo se encarga del hover general */
+.preset-4-card {
+    position: relative;
+    transition: transform 0.25s ease;
+}
+
+.preset-4-card:hover {
+    transform: translateY(-4px); /* sube 4px = ~2mm */
+}
+
+/* Contenedor de imagen: aquí anclamos badge + botón */
+.preset-4-card .clevers-card-image {
+    position: relative;
+    overflow: hidden; /* para que el botón no se salga del recuadro de la imagen */
+}
+
+/* BOTÓN oculto sobre la imagen */
+.preset-4-card .clevers-card-image .button {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 0;
+    font-size: 14px;
+
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    text-align: center;
+    text-decoration: none;
+
+    padding: 5px 15px !important;
+    line-height: 35px;
+
+    background: var(--clevers-button-background) !important;
+    color: var(--clevers-button-text) !important;
+
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 100;
+}
+
+/* Mostrar botón al pasar el mouse por la imagen */
+.preset-4-card .clevers-card-image:hover .button {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Info del producto abajo como siempre */
+.preset-4-card .product-info {
+    z-index: 50;
+    position: relative;
+    padding-right: 10px;
+    margin-top: 5px;
+}
+
+.preset-4-card .product-info a {
+    text-decoration: none;
+    font-size: 14px !important;
+
+}
+
+.preset-4-card .product-info .price-area {
+    margin: 5px 0 !important;
+    font-size: 15px !important;
+    font-weight: 600;
+}
+
+.preset-4-card .product-info .price-area ins {
+    color: var(--clevers-primary) !important;
+    font-weight: 600;
+}
+
+/* Badge sobre la imagen, anclado al contenedor de imagen */
+.preset-4-card .clevers-card-image .badge-discount {
+    position: absolute;
+    left: 1em;
+    top: 2em;
+    transform: translateY(-50%);
+    background: var(--clevers-bubble-background) !important;
+    color: var(--clevers-bubble-text) !important;
+    border-radius: 3px;
+    padding: 0.4em 0.8em;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
 }

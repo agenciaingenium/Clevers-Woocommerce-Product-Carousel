@@ -4,7 +4,7 @@ Donate link: https://clevers.dev
 Tags: woocommerce, carousel, products, ecommerce,
 Requires at least: 5.8
 Tested up to: 6.8
-Stable Version: 1.0.3
+Stable tag: 1.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -126,7 +126,3 @@ Este plugin es software libre, licenciado bajo la GPLv2 o posterior.
    svn add clevers-product-carousel.php assets templates languages readme.txt
    svn ci -m "Initial commit version 0.2.0"
    ```
-
----
-
-¿Quieres que te genere también un **`clevers-product-carousel.pot`** con las cadenas listas para traducción y el comando para automatizarlo (WP-CLI o Poedit)? Puedo dejarlo preparado.

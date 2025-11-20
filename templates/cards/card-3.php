@@ -22,13 +22,6 @@ $discount = clevers_product_carousel_get_discount_percentage(
     $clevers_product_carousel_product,
     'max' // 'min' / 'avg' también válidos
 );
-
-// Texto accesible para el botón "Añadir al carrito".
-$aria_label = sprintf(
-    /* translators: %s: product title. */
-    esc_html__( 'Add %s to your cart', 'clevers-product-carousel' ),
-    $title
-);
 ?>
 <div class="clevers-card preset-3-card" data-product-id="<?php echo esc_attr( $clevers_product_carousel_product->get_id() ); ?>">
     <a href="<?php echo esc_url( $permalink ); ?>" class="product-thumb">
@@ -48,22 +41,9 @@ $aria_label = sprintf(
             <?php echo wp_kses_post( $price_html ); ?>
         </div>
 
-        <?php if ( $clevers_product_carousel_product->is_type( 'simple' ) ) : ?>
-
-            <a href="<?php echo esc_url( $clevers_product_carousel_product->add_to_cart_url() ); ?>"
-               class="button add_to_cart_button ajax_add_to_cart"
-               data-product_id="<?php echo esc_attr( $clevers_product_carousel_product->get_id() ); ?>"
-               data-product_sku="<?php echo esc_attr( $clevers_product_carousel_product->get_sku() ); ?>"
-               aria-label="<?php echo esc_attr( $aria_label ); ?>">
-                <?php esc_html_e( 'Añadir al carrito', 'clevers-product-carousel' ); ?>
-            </a>
-
-        <?php else : ?>
-
             <a href="<?php echo esc_url( $permalink ); ?>" class="button select-options">
-                <?php esc_html_e( 'Seleccionar opciones', 'clevers-product-carousel' ); ?>
+                <?php esc_html_e( 'Ver Producto', 'clevers-product-carousel' ); ?>
             </a>
 
-        <?php endif; ?>
     </div>
 </div>
