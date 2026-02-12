@@ -94,6 +94,8 @@ jobs:
           rsync -a \
             --exclude ".git" \
             --exclude ".github" \
+            --exclude ".idea" \
+            --exclude "bin" \
             --exclude ".gitignore" \
             --exclude ".gitattributes" \
             --exclude "node_modules" \

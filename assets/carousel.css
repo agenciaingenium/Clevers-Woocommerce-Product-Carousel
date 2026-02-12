@@ -260,8 +260,8 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     width: 40px;
     height: 40px;
     border-radius: 9999px;
-    background: #111;
-    color: #ffd60a;
+    background: var(--clevers-bubble-background);
+    color: var(--clevers-bubble-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -316,7 +316,7 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 
 /* Slide central destacado (requiere centerMode en Slick) */
 .clevers-product-carousel.preset-2 .slick-center .clevers-product.card-2 {
-    outline: 3px solid #2b6cb0; /* azul como en la imagen */
+    outline: 3px solid var(--clevers-secondary); /* azul como en la imagen */
     outline-offset: 2px;
     transform: translateY(-2px);
     transition: transform .2s ease, outline-color .2s ease;
@@ -491,4 +491,36 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
     font-weight: bold;
     font-size: 12px;
     text-align: center;
+}
+
+/* PRESET 1 CUSTOMIZATION */
+.preset-1-card .badge-discount {
+    background: var(--clevers-bubble-background);
+    color: var(--clevers-bubble-text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+.preset-1-card .product-title {
+    color: var(--clevers-text);
+}
+
+.preset-1-card .price-area ins {
+    color: var(--clevers-primary);
+    font-weight: bold;
+}
+
+.preset-1-card .button {
+    background: var(--clevers-button-background);
+    color: var(--clevers-button-text);
+}
+
+.preset-1-card .button:hover {
+    background: var(--clevers-secondary);
 }
