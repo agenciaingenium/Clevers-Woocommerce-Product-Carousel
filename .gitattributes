@@ -8,6 +8,9 @@
 /.gitattributes export-ignore
 /.distignore export-ignore
 /.DS_Store export-ignore
+/.release-build export-ignore
 /bin export-ignore
 /tests export-ignore
 /README.md export-ignore
+/RELEASING.md export-ignore
+/Makefile export-ignore
