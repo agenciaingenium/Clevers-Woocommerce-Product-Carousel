@@ -8,7 +8,11 @@
  *   php bin/bump-version.php 1.1.0
  */
 
-if ( ! defined( 'ABSPATH' ) && 'cli' !== PHP_SAPI ) {
+if ( 'cli' === PHP_SAPI && ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -18,20 +22,20 @@ if ( $argc < 2 ) {
 	exit( 1 );
 }
 
-$clv_new_version = $argv[1];
+$clevers_product_carousel_new_version = $argv[1];
 
-if ( ! preg_match( '/^[0-9]+\.[0-9]+\.[0-9]+$/', $clv_new_version ) ) {
+if ( ! preg_match( '/^[0-9]+\.[0-9]+\.[0-9]+$/', $clevers_product_carousel_new_version ) ) {
 	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite,WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI utility output.
-	fwrite( STDERR, "Versión inválida: {$clv_new_version}. Usa formato X.Y.Z\n" );
+	fwrite( STDERR, "Versión inválida: {$clevers_product_carousel_new_version}. Usa formato X.Y.Z\n" );
 	exit( 1 );
 }
 
-$clv_root = dirname( __DIR__ );
+$clevers_product_carousel_root = dirname( __DIR__ );
 
 /**
  * Actualiza la línea " * Version: X.Y.Z" en el header del plugin.
  */
-function clv_bump_plugin_header_version( string $file, string $new_version ): void {
+function clevers_product_carousel_bump_plugin_header_version( string $file, string $new_version ): void {
 	if ( ! file_exists( $file ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI utility output.
 		echo "Archivo no encontrado: {$file}\n";
@@ -70,7 +74,7 @@ function clv_bump_plugin_header_version( string $file, string $new_version ): vo
 /**
  * Actualiza la línea "Stable tag: X.Y.Z" en readme.txt.
  */
-function clv_bump_readme_stable_tag( string $file, string $new_version ): void {
+function clevers_product_carousel_bump_readme_stable_tag( string $file, string $new_version ): void {
 	if ( ! file_exists( $file ) ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI utility output.
 		echo "Archivo no encontrado: {$file}\n";
@@ -100,8 +104,8 @@ function clv_bump_readme_stable_tag( string $file, string $new_version ): void {
 }
 
 // Ejecutar updates
-clv_bump_plugin_header_version( $clv_root . '/clevers-product-carousel.php', $clv_new_version );
-clv_bump_readme_stable_tag( $clv_root . '/readme.txt', $clv_new_version );
+clevers_product_carousel_bump_plugin_header_version( $clevers_product_carousel_root . '/clevers-product-carousel.php', $clevers_product_carousel_new_version );
+clevers_product_carousel_bump_readme_stable_tag( $clevers_product_carousel_root . '/readme.txt', $clevers_product_carousel_new_version );
 
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI utility output.
 echo "\nListo. Revisa los cambios con: git diff\n";

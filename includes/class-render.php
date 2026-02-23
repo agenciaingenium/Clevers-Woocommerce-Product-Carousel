@@ -141,7 +141,8 @@ class Clevers_Product_Carousel_Render {
 // Helper functions for templates
 function clevers_product_carousel_render_card( $clevers_product_carousel_product, $settings ) {
 	// Compatibilidad con plantillas WooCommerce que usan global $product.
-	$GLOBALS['product'] = $clevers_product_carousel_product;
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WooCommerce template compatibility.
+		$GLOBALS['product'] = $clevers_product_carousel_product;
 
 	$tpl = 'cards/card-' . (int) $settings['preset'] . '.php';
 
