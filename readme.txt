@@ -3,66 +3,66 @@ Contributors: cleversdevs
 Donate link: https://clevers.dev
 Tags: woocommerce, carousel, products, ecommerce,
 Requires at least: 5.8
-Tested up to: 6.8
-Stable tag: 0.1.0
+Tested up to: 6.9
+Stable tag: 1.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Crea carousels profesionales de productos WooCommerce con presets personalizables, colores por carrusel y diseño responsive basado en Slick.js.
+Create professional WooCommerce product carousels with customizable presets, per-carousel colors, and a responsive Slick.js-based layout.
 
 == Description ==
 
-**Clevers Product Carousel** te permite crear y mostrar carruseles de productos de WooCommerce completamente personalizables desde el panel de administración.
+**Clevers Product Carousel** lets you create and display fully customizable WooCommerce product carousels from the WordPress admin area.
 
-- Diseños prediseñados ("presets") listos para usar.
-- Personalización de colores, botones, fondo y texto por carrusel.
-- Filtros de productos: destacados, en oferta, en stock, categorías específicas.
-- Configuración de slides, autoplay, dots y flechas.
-- Cache inteligente y variables CSS dinámicas para mejor rendimiento.
-- Soporte para plantillas sobreescribibles en el tema (como WooCommerce).
+- Ready-to-use carousel and card presets.
+- Per-carousel color settings for buttons, background, and text.
+- Product filters: featured, on-sale, in-stock, and categories.
+- Carousel controls: slides, autoplay, dots, and arrows.
+- Cached rendering and dynamic CSS variables for performance.
+- Theme-overridable templates (WooCommerce-style structure).
 
-### Características principales
+= Main Features =
 
-✅ **Presets personalizables:** 4 diseños base, fácilmente extendibles.
-🎨 **Colores dinámicos:** define colores por carousel (primary, secondary, botones, burbujas, etc.).
-🛒 **Compatibilidad completa con WooCommerce.**
-⚙️ **Opciones visuales:** autoplay, velocidad, número de slides visibles, flechas y dots.
-🚀 **Plantillas sobreescribibles:** copia `templates/carousels/carousel-1.php` o `templates/cards/card-1.php` en tu tema bajo `/clevers-product-carousel/` para personalizar el HTML.
-🧠 **Sistema de caché avanzado:** evita consultas repetitivas y mejora la velocidad.
+* **Customizable presets:** 4 base designs that can be extended.
+* **Dynamic colors:** define colors per carousel (primary, secondary, buttons, badges, etc.).
+* **WooCommerce compatible:** uses WooCommerce product data and pricing.
+* **Visual options:** autoplay, speed, slides to show, arrows, and dots.
+* **Theme overrides:** copy `templates/carousels/carousel-1.php` or `templates/cards/card-1.php` to `/clevers-product-carousel/` inside your theme to customize markup.
+* **Caching system:** reduces repeated queries and improves rendering speed.
 
 == Installation ==
 
-1. Sube la carpeta del plugin al directorio `/wp-content/plugins/`, o instálalo directamente desde el repositorio de WordPress.
-2. Activa el plugin desde el menú "Plugins" en WordPress.
-3. Crea un nuevo **Product Carousel** desde el menú “Product Carousels” en el panel de administración.
-4. Configura su diseño, colores y filtros.
-5. Inserta el carousel en cualquier página o plantilla usando el shortcode:
+1. Upload the plugin folder to `/wp-content/plugins/`, or install it from the WordPress plugin directory.
+2. Activate the plugin from the "Plugins" menu in WordPress.
+3. Create a new **Product Carousel** from the “Product Carousels” menu in the admin area.
+4. Configure layout, colors, and filters.
+5. Insert the carousel into any page or template using the shortcode:
 
 ```
 [clevers_carousel id="123"]
 ```
 
-*(Reemplaza `123` por el ID de tu carousel.)*
+Replace `123` with your carousel post ID.
 
 == Frequently Asked Questions ==
 
-= ¿Puedo usarlo sin WooCommerce? =
-No. El plugin requiere WooCommerce activo para poder obtener los productos.
+= Can I use it without WooCommerce? =
+No. The plugin requires WooCommerce to load products.
 
-= ¿Cómo cambio el diseño de las tarjetas? =
-Copia el archivo desde:
+= How do I change the card layout? =
+Copy the file from:
 ```
 wp-content/plugins/clevers-product-carousel/templates/cards/card-1.php
 ```
-a:
+to:
 ```
 wp-content/themes/tu-tema/clevers-product-carousel/cards/card-1.php
 ```
-y edítalo allí.
+and edit it in your theme.
 
-= ¿Cómo personalizo los colores? =
-Cada carousel tiene sus propios campos de color en el editor. También puedes usar CSS variables:
+= How do I customize colors? =
+Each carousel includes color fields in the editor. You can also override CSS variables:
 
 ```css
 #clevers-product-carousel-123 {
@@ -72,57 +72,32 @@ Cada carousel tiene sus propios campos de color en el editor. También puedes us
 ```
 
 == Screenshots ==
-1. Panel de administración con los campos de configuración del carousel.
-2. Ejemplo de carousel de productos en el frontend.
-3. Edición de colores por carrusel.
-4. Diferentes presets de tarjetas.
+1. Admin panel with carousel configuration fields.
+2. Example WooCommerce product carousel on the frontend.
+3. Per-carousel color settings.
+4. Different card presets.
 
 == Changelog ==
 
+= 1.1.2 =
+* Updated compatibility headers for the latest WordPress version.
+* Improved release packaging for WordPress.org-ready ZIP files.
+* Code quality fixes for Plugin Check / WordPress Coding Standards.
+
 = 0.2.0 =
-* Añadido sistema de colores por carousel (CSS variables dinámicas).
-* Mejorado el render con caché inteligente.
-* Añadido soporte para sobrescribir plantillas en el tema.
-* Refactor general del código.
+* Added per-carousel color system (dynamic CSS variables).
+* Improved rendering with cache support.
+* Added theme template override support.
+* General code refactor.
 
 = 0.1.0 =
-* Versión inicial: creación de carousels de productos básicos.
+* Initial release with WooCommerce product carousel support.
 
 == Upgrade Notice ==
 
-= 0.2.3 =
-Esta actualización introduce variables CSS por carousel. Asegúrate de limpiar la caché del navegador tras actualizar.
+= 1.1.2 =
+Compatibility and packaging update for WordPress.org submission.
 
 == License ==
 
-Este plugin es software libre, licenciado bajo la GPLv2 o posterior.
-
----
-
-## 💡 Recomendaciones para publicar
-
-1. **Nombre del archivo principal:**
-   Debe coincidir con el *slug* que usarás en WordPress.org, ej. `clevers-product-carousel.php`.
-
-2. **Text Domain:**
-   Ya está correcto: `clevers-product-carousel`.
-
-3. **Dominio del plugin:**
-   Carpeta recomendada: `clevers-product-carousel`.
-
-4. **Internacionalización (i18n):**
-   Crea el `.pot` con:
-   ```bash
-   wp i18n make-pot . languages/clevers-product-carousel.pot
-   ```
-
-5. **Validación:**
-   Usa el [Plugin Check](https://wordpress.org/plugins/plugin-check/) para verificar estándares.
-
-6. **Commit inicial (SVN o GitHub):**
-   ```bash
-   svn mkdir https://plugins.svn.wordpress.org/clevers-product-carousel/trunk
-   svn mkdir https://plugins.svn.wordpress.org/clevers-product-carousel/tags/0.2.0
-   svn add clevers-product-carousel.php assets templates languages readme.txt
-   svn ci -m "Initial commit version 0.2.0"
-   ```
+This plugin is free software, licensed under GPLv2 or later.

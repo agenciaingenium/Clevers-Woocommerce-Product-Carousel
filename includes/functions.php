@@ -32,12 +32,10 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
 
 	switch ( $orderby ) {
 		case 'price':
-			$args['orderby']  = 'meta_value_num';
-			$args['meta_key'] = '_price';
+			$args['orderby'] = 'price';
 			break;
 		case 'popularity':
-			$args['orderby']  = 'meta_value_num';
-			$args['meta_key'] = 'total_sales';
+			$args['orderby'] = 'popularity';
 			break;
 		case 'rating':
 			$args['orderby'] = 'rating';

@@ -1,6 +1,10 @@
 <?php
 // templates/carousels/carousel-1.php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /** @var array $settings */
 /** @var int $carousel_id */
 /** @var WC_Product[] $products */

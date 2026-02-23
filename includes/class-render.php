@@ -93,7 +93,8 @@ class Clevers_Product_Carousel_Render {
 
 		$products = ( new WC_Product_Query( $args ) )->get_products();
 
-		// Save global product to restore later
+		// Save global product to restore later.
+		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 		global $product;
 		$original_product = $product;
 
@@ -110,6 +111,7 @@ class Clevers_Product_Carousel_Render {
 
 		// Restore global product
 		$product = $original_product;
+		// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 		set_transient( $cache_key, $html, 10 * MINUTE_IN_SECONDS );
 

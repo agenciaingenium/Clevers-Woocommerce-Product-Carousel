@@ -1,4 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /** @var int $carousel_id */
 /** @var array $settings */
 /** @var WC_Product[] $products */

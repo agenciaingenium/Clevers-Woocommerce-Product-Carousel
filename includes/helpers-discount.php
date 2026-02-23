@@ -1,7 +1,11 @@
 <?php
 // inc/helpers-discount.php
 
-if (!function_exists('clevers_product_carousel_get_discount_percentage')) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! function_exists( 'clevers_product_carousel_get_discount_percentage' ) ) {
     /**
      * Calcula el % de descuento de un producto.
      *

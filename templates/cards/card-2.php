@@ -1,4 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /** @var WC_Product $clevers_product_carousel_product */
 /** @var array       $settings */
 

@@ -10,6 +10,7 @@ permissions:
 env:
   PLUGIN_SLUG: clevers-product-carousel
   PLUGIN_MAIN: clevers-product-carousel.php
+  DISTIGNORE: .distignore
 
 jobs:
   build:
@@ -90,29 +91,18 @@ jobs:
           mkdir -p "$PLUGIN_SLUG"
 
       - name: Stage plugin files
+        shell: bash
         run: |
+          RSYNC_EXCLUDES=()
+          if [ -f "$DISTIGNORE" ]; then
+            RSYNC_EXCLUDES+=(--exclude-from="$DISTIGNORE")
+          fi
+
           rsync -a \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude ".idea" \
-            --exclude "bin" \
-            --exclude ".gitignore" \
-            --exclude ".gitattributes" \
-            --exclude "node_modules" \
-            --exclude "vendor/bin" \
-            --exclude "tests" \
-            --exclude ".DS_Store" \
-            --exclude "*.lock" \
+            --exclude "$PLUGIN_SLUG" \
+            --exclude "dist" \
+            "${RSYNC_EXCLUDES[@]}" \
             ./ "./$PLUGIN_SLUG"
-          if [ -d "vendor" ]; then
-            rsync -a vendor "./$PLUGIN_SLUG/vendor"
-          fi
-          if [ -d "dist" ] && [ "$PLUGIN_SLUG" != "dist" ]; then
-            rsync -a dist "./$PLUGIN_SLUG/dist"
-          fi
-          if [ -d "build" ]; then
-            rsync -a build "./$PLUGIN_SLUG/build"
-          fi
 
       - name: Read version for zip name
         id: ver
