@@ -16,12 +16,10 @@ $clevers_product_carousel_discount = clevers_product_carousel_get_discount_perce
 <div class="clevers-product card-2">
     <div class="product-media">
         <?php if ( null !== $clevers_product_carousel_discount ) : ?>
-            <span class="clv-badge-round">
-                <?php echo esc_html( $clevers_product_carousel_discount ); ?>%
-            </span>
+            <?php echo wp_kses_post( clevers_product_carousel_render_discount_badge( (int) $clevers_product_carousel_discount, $settings, 'clv-badge-round' ) ); ?>
         <?php endif; ?>
 
-        <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="product-thumb">
+        <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="product-thumb" aria-label="<?php echo esc_attr( $clevers_product_carousel_product->get_name() ); ?>">
             <?php echo wp_kses_post( $clevers_product_carousel_product->get_image( 'woocommerce_thumbnail' ) ); ?>
         </a>
     </div>
@@ -39,11 +37,12 @@ $clevers_product_carousel_discount = clevers_product_carousel_get_discount_perce
             <a href="<?php echo esc_url( $clevers_product_carousel_product->add_to_cart_url() ); ?>"
                class="clevers-button ajax_add_to_cart add_to_cart_button"
                data-product_id="<?php echo esc_attr( $clevers_product_carousel_product->get_id() ); ?>"
-               data-product_sku="<?php echo esc_attr( $clevers_product_carousel_product->get_sku() ); ?>">
+               data-product_sku="<?php echo esc_attr( $clevers_product_carousel_product->get_sku() ); ?>"
+               aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to your cart', 'clevers-product-carousel' ), $clevers_product_carousel_product->get_name() ) ); ?>">
                 <?php esc_html_e( 'Añadir al carrito', 'clevers-product-carousel' ); ?>
             </a>
         <?php else : ?>
-            <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="clevers-button">
+            <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="clevers-button" aria-label="<?php echo esc_attr( $clevers_product_carousel_product->get_name() ); ?>">
                 <?php esc_html_e( 'Seleccionar opciones', 'clevers-product-carousel' ); ?>
             </a>
         <?php endif; ?>

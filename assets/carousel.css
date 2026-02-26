@@ -27,6 +27,29 @@
     color: var(--clevers-primary);
 }
 
+.clevers-product-carousel .slick-carousel:not(.slick-initialized) {
+    display: grid;
+    grid-template-columns: repeat(var(--clv-fallback-desktop, 4), minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+.clevers-product-carousel .slick-carousel:not(.slick-initialized) .carousel-item {
+    min-width: 0;
+}
+
+@media (max-width: 1024px) {
+    .clevers-product-carousel .slick-carousel:not(.slick-initialized) {
+        grid-template-columns: repeat(var(--clv-fallback-tablet, 2), minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .clevers-product-carousel .slick-carousel:not(.slick-initialized) {
+        grid-template-columns: repeat(var(--clv-fallback-mobile, 1), minmax(0, 1fr));
+    }
+}
+
 .clevers-product-carousel .slick-slide {
     margin: 10px;
     min-height: 450px;
@@ -523,4 +546,49 @@ a.clevers-button.ajax_add_to_cart.add_to_cart_button:focus {
 
 .preset-1-card .button:hover {
     background: var(--clevers-secondary);
+}
+
+.clevers_product_carousel-badge-discount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.clevers-product-carousel a:focus-visible,
+.clevers-product-carousel button:focus-visible,
+.clevers-product-carousel .slick-dots li button:focus-visible,
+.clevers-product-carousel .slick-prev:focus-visible,
+.clevers-product-carousel .slick-next:focus-visible {
+    outline: 2px solid var(--clevers-primary);
+    outline-offset: 2px;
+}
+
+.preset-4-card .clevers-card-image:focus-within .button {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clevers-product-carousel *,
+    .clevers-product-carousel *::before,
+    .clevers-product-carousel *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

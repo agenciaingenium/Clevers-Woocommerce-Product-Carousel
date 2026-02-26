@@ -23,21 +23,21 @@ class Clevers_Product_Carousel_CPT {
 	public function register_cpt_and_assets() {
 		// Slick desde el propio plugin (no CDN).
 		wp_register_style(
-			'slick',
+			'clv-slick',
 			CLV_URL . 'assets/vendor/slick/slick.css',
 			array(),
 			'1.8.1'
 		);
 
 		wp_register_style(
-			'slick-theme',
+			'clv-slick-theme',
 			CLV_URL . 'assets/vendor/slick/slick-theme.css',
-			array( 'slick' ),
+			array( 'clv-slick' ),
 			'1.8.1'
 		);
 
 		wp_register_script(
-			'slick',
+			'clv-slick',
 			CLV_URL . 'assets/vendor/slick/slick.min.js',
 			array( 'jquery' ),
 			'1.8.1',
@@ -53,16 +53,27 @@ class Clevers_Product_Carousel_CPT {
 		wp_register_style(
 			'clv-carousel',
 			CLV_URL . 'assets/carousel.css',
-			array( 'slick', 'slick-theme' ),
+			array( 'clv-slick', 'clv-slick-theme' ),
 			$css_ver
 		);
 
 		wp_register_script(
 			'clv-carousel',
 			CLV_URL . 'assets/carousel.js',
-			array( 'slick' ),
+			array( 'clv-slick' ),
 			$js_ver,
 			true
+		);
+
+		wp_localize_script(
+			'clv-carousel',
+			'clvCarouselI18n',
+			array(
+				'prevSlide' => __( 'Previous slide', 'clevers-product-carousel' ),
+				'nextSlide' => __( 'Next slide', 'clevers-product-carousel' ),
+				'goToSlide' => __( 'Go to slide %d', 'clevers-product-carousel' ),
+				'carousel'  => __( 'Product carousel', 'clevers-product-carousel' ),
+			)
 		);
 
 		$labels = array(
@@ -81,6 +92,7 @@ class Clevers_Product_Carousel_CPT {
 			'public'          => false,
 			'show_ui'         => true,
 			'show_in_menu'    => true,
+			'show_in_rest'    => true,
 			'menu_icon'       => 'dashicons-images-alt2',
 			'supports'        => array( 'title' ),
 			'capability_type' => 'post',

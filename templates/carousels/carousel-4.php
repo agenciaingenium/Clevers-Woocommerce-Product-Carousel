@@ -8,22 +8,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** @var array $settings */
 /** @var WC_Product[] $products */
 ?>
-<div class="clevers-product-carousel preset-4" id="clevers-product-carousel-<?php echo (int)$carousel_id; ?>">
-    <?php if (!empty($products)) : ?>
-        <div class="slick-carousel"
-             data-slides="<?php echo (int)($settings['slidesToShow'] ?? 4); ?>"
-             data-autoplay="<?php echo !empty($settings['autoplay']) ? 'true' : 'false'; ?>"
-             data-speed="<?php echo (int)($settings['autoplayMs'] ?? 3000); ?>"
-             data-dots="<?php echo !empty($settings['dots']) ? 'true' : 'false'; ?>"
-             data-arrows="<?php echo !empty($settings['arrows']) ? 'true' : 'false'; ?>"
-             data-center="true"> <!-- centro activo para borde/zoom -->
-            <?php foreach ($products as $clevers_product_carousel_product) : ?>
-                <div class="carousel-item">
-                    <?php clevers_product_carousel_render_card($clevers_product_carousel_product, $settings); ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else : ?>
-        <p><?php esc_html_e('No hay productos disponibles.', 'clevers-product-carousel'); ?></p>
-    <?php endif; ?>
+<div
+	class="clevers-product-carousel preset-4"
+	id="clevers-product-carousel-<?php echo (int) $carousel_id; ?>"
+	role="region"
+	aria-roledescription="carousel"
+	aria-label="<?php echo esc_attr( sprintf( __( 'Product carousel %d', 'clevers-product-carousel' ), (int) $carousel_id ) ); ?>"
+>
+	<?php if ( ! empty( $products ) ) : ?>
+		<div
+			class="slick-carousel"
+			<?php echo clevers_product_carousel_get_slider_data_attributes( $carousel_id, $settings ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			data-center="true"
+		>
+			<?php foreach ( $products as $clevers_product_carousel_product ) : ?>
+				<div class="carousel-item">
+					<?php clevers_product_carousel_render_card( $clevers_product_carousel_product, $settings ); ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	<?php else : ?>
+		<p><?php esc_html_e( 'No hay productos disponibles.', 'clevers-product-carousel' ); ?></p>
+	<?php endif; ?>
 </div>

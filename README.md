@@ -1,4 +1,4 @@
-# 🧩 Clevers Product Slider
+# 🧩 Clevers Product Carousel
 
 > **Plugin de WordPress + WooCommerce**  
 > Crea sliders de productos profesionales, totalmente personalizables y con presets listos para usar.  
@@ -7,7 +7,7 @@
 ![WordPress Tested](https://img.shields.io/badge/Tested%20up%20to-6.7-blue?logo=wordpress)
 ![WooCommerce Compatible](https://img.shields.io/badge/WooCommerce-Compatible-success?logo=woocommerce)
 ![License](https://img.shields.io/badge/license-GPLv2-orange)
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.1-blue)
 
 ---
 
@@ -28,11 +28,11 @@
 ### Desde WordPress
 1. Sube el archivo `.zip` desde “Plugins → Añadir nuevo → Subir plugin”.
 2. Activa el plugin desde el panel de administración.
-3. Crea un nuevo **Product Slider** desde el menú “Product Sliders”.
+3. Crea un nuevo **Product Carousel** desde el menú “Product Carousels”.
 4. Inserta el shortcode donde quieras:
 
 ```php
-[clevers_slider id="123"]
+[clevers_carousel id="123"]
 ```
 
 ---
@@ -64,8 +64,8 @@ Cada carrusel permite configurar:
 Para personalizar la vista sin tocar el plugin:
 
 Copia el archivo desde:
-```
-wp-content/plugins/clevers-product-slider/templates/cards/card-1.php
+``` 
+wp-content/plugins/clevers-product-carousel/templates/cards/card-1.php
 ```
 
 a tu tema en:
@@ -96,14 +96,15 @@ El sistema cargará automáticamente tu versión.
 
 ## 🧱 Estructura del plugin
 
-```
-clevers-product-slider/
-├── clevers-product-slider.php
+``` 
+clevers-product-carousel/
+├── clevers-product-carousel.php
 ├── assets/
-│   ├── slider.css
+│   ├── carousel.css
 │   ├── carousel.js
+│   ├── block.js
 ├── templates/
-│   ├── sliders/
+│   ├── carousels/
 │   └── cards/
 └── languages/
 ```
@@ -122,4 +123,4 @@ https://www.gnu.org/licenses/gpl-2.0.html
 Desarrollado con ❤️ por [Clevers Devs](https://clevers.dev)
 
 ¿Quieres contribuir o sugerir mejoras?  
-Abre un issue o PR en [github.com/cleversdevs/clevers-product-slider](https://github.com/cleversdevs/clevers-product-slider)
+Abre un issue o PR en [github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel)

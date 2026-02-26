@@ -19,6 +19,7 @@ Create professional WooCommerce product carousels with customizable presets, per
 - Per-carousel color settings for buttons, background, and text.
 - Product filters: featured, on-sale, in-stock, and categories.
 - Carousel controls: slides, autoplay, dots, and arrows.
+- Gutenberg block to insert saved carousels from the editor.
 - Cached rendering and dynamic CSS variables for performance.
 - Theme-overridable templates (WooCommerce-style structure).
 
@@ -44,6 +45,8 @@ Create professional WooCommerce product carousels with customizable presets, per
 ```
 
 Replace `123` with your carousel post ID.
+
+You can also insert it using the **Clevers Product Carousel** block in Gutenberg.
 
 == Frequently Asked Questions ==
 
@@ -79,6 +82,13 @@ Each carousel includes color fields in the editor. You can also override CSS var
 
 == Changelog ==
 
+= 1.2.1 =
+* Added Gutenberg block for selecting saved carousels.
+* Improved admin UI (sorting, categories selector, shortcode box, preset preview).
+* Fixed filter combination logic for on-sale + featured products.
+* Expanded cache invalidation hooks for WooCommerce updates.
+* Accessibility and UX improvements for Slick carousel navigation.
+
 = 1.1.2 =
 * Updated compatibility headers for the latest WordPress version.
 * Improved release packaging for WordPress.org-ready ZIP files.
@@ -94,6 +104,9 @@ Each carousel includes color fields in the editor. You can also override CSS var
 * Initial release with WooCommerce product carousel support.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+Feature, admin UX, caching and accessibility improvements.
 
 = 1.1.2 =
 Compatibility and packaging update for WordPress.org submission.
