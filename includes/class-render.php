@@ -100,6 +100,7 @@ class Clevers_Product_Carousel_Render {
 
 		$html = get_transient( $cache_key );
 		if ( false !== $html ) {
+			$html = $this->inject_brizy_editor_preview_css( (string) $html );
 			return (string) apply_filters( 'clevers_carousel/rendered_html', $html, $carousel_id, $settings, true );
 		}
 
@@ -127,8 +128,39 @@ class Clevers_Product_Carousel_Render {
 		$cache_ttl = (int) apply_filters( 'clevers_carousel/cache_ttl', 10 * MINUTE_IN_SECONDS, $carousel_id, $settings, $args );
 		set_transient( $cache_key, $html, max( MINUTE_IN_SECONDS, $cache_ttl ) );
 
+		$html = $this->inject_brizy_editor_preview_css( (string) $html );
 		return (string) apply_filters( 'clevers_carousel/rendered_html', $html, $carousel_id, $settings, false );
 	}
+
+	/**
+	 * Brizy editor executes the shortcode HTML but often skips the carousel JS.
+	 * Inject a scoped CSS-only horizontal preview that applies only inside Brizy
+	 * shortcode wrappers, without affecting the frontend.
+	 *
+	 * @param string $html Rendered shortcode HTML.
+	 * @return string
+	 */
+	private function inject_brizy_editor_preview_css( string $html ): string {
+		if ( '' === $html ) {
+			return $html;
+		}
+
+		$marker = '<!-- Clevers Carousel Brizy preview CSS -->';
+		if ( false !== strpos( $html, $marker ) ) {
+			return $html;
+		}
+
+		$css  = $marker . "\n";
+		$css .= '<style>';
+		$css .= '.brz-wp-shortcode .clevers-product-carousel .slick-carousel:not(.slick-initialized){display:grid!important;grid-auto-flow:column!important;grid-auto-columns:calc(100%/var(--clv-fallback-desktop,4))!important;gap:16px!important;overflow-x:auto!important;overflow-y:hidden!important;align-items:stretch!important;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;}';
+		$css .= '.brz-wp-shortcode .clevers-product-carousel .slick-carousel:not(.slick-initialized) .carousel-item{min-width:0;scroll-snap-align:start;}';
+		$css .= '@media (max-width:1024px){.brz-wp-shortcode .clevers-product-carousel .slick-carousel:not(.slick-initialized){grid-auto-columns:calc(100%/var(--clv-fallback-tablet,2))!important;}}';
+		$css .= '@media (max-width:768px){.brz-wp-shortcode .clevers-product-carousel .slick-carousel:not(.slick-initialized){grid-auto-columns:calc(100%/var(--clv-fallback-mobile,1))!important;}}';
+		$css .= '</style>' . "\n";
+
+		return $css . $html;
+	}
+
 
 	private function enqueue_inline_vars( $carousel_id, array $settings ) {
 		$vars_map = array(
@@ -265,6 +297,12 @@ function clevers_product_carousel_get_slider_data_attributes( $carousel_id, arra
 		(int) $attrs['data-slides-mobile']
 	);
 
+	// Brizy editor preview often renders shortcode HTML without running Slick JS.
+	// Force a horizontal, scrollable layout directly inline so the preview remains usable.
+	if ( clevers_product_carousel_is_brizy_editor_preview_request() ) {
+		$attrs['style'] .= 'display:grid;grid-auto-flow:column;grid-auto-columns:calc(100%/var(--clv-fallback-desktop,4));gap:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;';
+	}
+
 	$attrs = apply_filters( 'clevers_carousel/slider_data_attributes', $attrs, $carousel_id, $settings );
 
 	$parts = array();
@@ -273,4 +311,34 @@ function clevers_product_carousel_get_slider_data_attributes( $carousel_id, arra
 	}
 
 	return implode( ' ', $parts );
+}
+
+/**
+ * Detect Brizy editor preview contexts (iframe/editor/AJAX shortcode preview).
+ *
+ * @return bool
+ */
+function clevers_product_carousel_is_brizy_editor_preview_request(): bool {
+	$action = isset( $_REQUEST['action'] ) ? (string) wp_unslash( $_REQUEST['action'] ) : '';
+	if ( false !== stripos( $action, 'in-front-editor' ) ) {
+		return true;
+	}
+
+	if ( isset( $_REQUEST['is-editor-iframe'] ) ) {
+		return true;
+	}
+
+	if ( false !== stripos( $action, 'shortcode_content' ) ) {
+		$shortcode = isset( $_REQUEST['shortcode'] ) ? (string) wp_unslash( $_REQUEST['shortcode'] ) : '';
+		if ( false !== stripos( $shortcode, '[clevers_carousel' ) ) {
+			return true;
+		}
+	}
+
+	$referer = wp_get_referer();
+	if ( is_string( $referer ) && false !== stripos( $referer, 'in-front-editor' ) ) {
+		return true;
+	}
+
+	return false;
 }

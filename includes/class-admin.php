@@ -79,10 +79,7 @@ class Clevers_Product_Carousel_Admin {
 				<?php esc_html_e( 'Export JSON', 'clevers-product-carousel' ); ?>
 			</a>
 		</p>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:10px;">
-			<?php wp_nonce_field( 'clv_import_carousel_json_' . (int) $post->ID ); ?>
-			<input type="hidden" name="action" value="clv_import_carousel_json" />
-			<input type="hidden" name="post_id" value="<?php echo esc_attr( (int) $post->ID ); ?>" />
+		<div style="margin-top:10px;">
 			<label for="clv-import-json-<?php echo esc_attr( (int) $post->ID ); ?>">
 				<?php esc_html_e( 'Import JSON into this carousel', 'clevers-product-carousel' ); ?>
 			</label>
@@ -93,10 +90,13 @@ class Clevers_Product_Carousel_Admin {
 				class="widefat"
 				placeholder="<?php echo esc_attr( '{"preset":1,"limit":8}' ); ?>"
 			></textarea>
-			<p>
-				<button type="submit" class="button button-primary"><?php esc_html_e( 'Import Settings', 'clevers-product-carousel' ); ?></button>
+			<p class="description">
+				<?php esc_html_e( 'Uses the main editor save flow to avoid nested forms.', 'clevers-product-carousel' ); ?>
 			</p>
-		</form>
+			<p>
+				<button type="submit" name="clv_apply_import_json" value="1" class="button button-primary"><?php esc_html_e( 'Import Settings', 'clevers-product-carousel' ); ?></button>
+			</p>
+		</div>
 
 		<style>
 			.clv-preview-shell { border: 1px solid #dcdcde; border-radius: 8px; padding: 10px; background: #fff; }
@@ -651,6 +651,26 @@ class Clevers_Product_Carousel_Admin {
 			return;
 		}
 
+		$import_requested = isset( $_POST['clv_apply_import_json'] );
+		if ( $import_requested ) {
+			$raw      = isset( $_POST['clv_import_json'] ) ? wp_unslash( $_POST['clv_import_json'] ) : '';
+			$settings = $this->extract_import_settings_from_raw( $raw );
+
+			if ( is_array( $settings ) ) {
+				$normalized = $this->normalize_imported_settings( $settings );
+				update_post_meta( $post_id, '_clv_settings', $normalized );
+				$ver = (int) get_post_meta( $post_id, '_clv_cache_version', true );
+				update_post_meta( $post_id, '_clv_cache_version', $ver + 1 );
+				$this->append_notice_to_redirect( 'imported' );
+			} elseif ( '' === trim( (string) $raw ) ) {
+				$this->append_notice_to_redirect( 'import_empty' );
+			} else {
+				$this->append_notice_to_redirect( 'import_invalid' );
+			}
+
+			return;
+		}
+
 		$in = filter_input( INPUT_POST, 'clv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		if ( ! is_array( $in ) ) {
 			$in = array();
@@ -911,21 +931,8 @@ class Clevers_Product_Carousel_Admin {
 			$this->redirect_with_notice( $post_id, 'import_empty' );
 		}
 
-		$data = json_decode( $raw, true );
-		if ( ! is_array( $data ) ) {
-			$this->redirect_with_notice( $post_id, 'import_invalid' );
-		}
-
-		$settings = array();
-		if ( isset( $data['carousel']['settings'] ) && is_array( $data['carousel']['settings'] ) ) {
-			$settings = $data['carousel']['settings'];
-		} elseif ( isset( $data['settings'] ) && is_array( $data['settings'] ) ) {
-			$settings = $data['settings'];
-		} elseif ( $this->looks_like_settings_array( $data ) ) {
-			$settings = $data;
-		}
-
-		if ( empty( $settings ) || ! is_array( $settings ) ) {
+		$settings = $this->extract_import_settings_from_raw( $raw );
+		if ( ! is_array( $settings ) ) {
 			$this->redirect_with_notice( $post_id, 'import_invalid' );
 		}
 
@@ -1060,6 +1067,41 @@ class Clevers_Product_Carousel_Admin {
 		}
 
 		return false;
+	}
+
+	private function extract_import_settings_from_raw( $raw ) {
+		$raw = trim( (string) $raw );
+		if ( '' === $raw ) {
+			return null;
+		}
+
+		$data = json_decode( $raw, true );
+		if ( ! is_array( $data ) ) {
+			return null;
+		}
+
+		if ( isset( $data['carousel']['settings'] ) && is_array( $data['carousel']['settings'] ) ) {
+			return $data['carousel']['settings'];
+		}
+
+		if ( isset( $data['settings'] ) && is_array( $data['settings'] ) ) {
+			return $data['settings'];
+		}
+
+		if ( $this->looks_like_settings_array( $data ) ) {
+			return $data;
+		}
+
+		return null;
+	}
+
+	private function append_notice_to_redirect( $notice ) {
+		add_filter(
+			'redirect_post_location',
+			static function ( $location ) use ( $notice ) {
+				return add_query_arg( 'clv_notice', sanitize_key( $notice ), $location );
+			}
+		);
 	}
 
 	private function normalize_imported_settings( array $settings ) {

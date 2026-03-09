@@ -1,4 +1,8 @@
 (function ($) {
+  var retryTimer = null;
+  var retryAttempts = 0;
+  var maxRetryAttempts = 30;
+
   function boolData($el, key, fallback) {
     var raw = $el.data(key);
     if (typeof raw === 'undefined') return !!fallback;
@@ -51,6 +55,7 @@
 
       if (typeof $el.slick !== 'function') {
         console.warn('Clevers Product Carousel: Slick not loaded');
+        scheduleRetry();
         return;
       }
 
@@ -123,9 +128,25 @@
     });
   }
 
+  function scheduleRetry() {
+    if (retryTimer || retryAttempts >= maxRetryAttempts) return;
+
+    retryAttempts += 1;
+    retryTimer = window.setTimeout(function () {
+      retryTimer = null;
+      initCleversSliders(document);
+    }, Math.min(250 * retryAttempts, 1500));
+  }
+
   $(function () {
     initCleversSliders(document);
   });
+
+  // Expose a manual hook for builders/console debugging.
+  window.CleversProductCarouselInit = function (ctx) {
+    retryAttempts = 0;
+    initCleversSliders(ctx || document);
+  };
 
   // Builders like Brizy inject modules after DOM ready; observe and re-init.
   if (typeof MutationObserver === 'function') {
@@ -178,5 +199,11 @@
     initCleversSliders(document);
     setTimeout(function () { initCleversSliders(document); }, 300);
     setTimeout(function () { initCleversSliders(document); }, 1200);
+    setTimeout(function () { initCleversSliders(document); }, 2500);
+    setTimeout(function () { initCleversSliders(document); }, 5000);
+  });
+
+  $(window).on('pageshow resize message', function () {
+    initCleversSliders(document);
   });
 })(jQuery);
