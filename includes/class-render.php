@@ -9,6 +9,7 @@ class Clevers_Product_Carousel_Render {
 	public function init() {
 		add_shortcode( 'clevers_carousel', array( $this, 'shortcode' ) );
 		add_action( 'init', array( $this, 'register_block_type' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_assets' ) );
 
 		// Invalidación por cambios de productos.
 		add_action( 'save_post_product', array( $this, 'invalidate_cache' ) );
@@ -20,6 +21,34 @@ class Clevers_Product_Carousel_Render {
 		add_action( 'updated_post_meta', array( $this, 'invalidate_cache_on_product_meta_change' ), 10, 4 );
 		add_action( 'added_post_meta', array( $this, 'invalidate_cache_on_product_meta_change' ), 10, 4 );
 		add_action( 'deleted_post_meta', array( $this, 'invalidate_cache_on_product_meta_change' ), 10, 4 );
+	}
+
+	public function maybe_enqueue_assets() {
+		if ( is_admin() || ! is_singular() ) {
+			return;
+		}
+
+		$post = get_queried_object();
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$content       = (string) $post->post_content;
+		$has_shortcode = has_shortcode( $content, 'clevers_carousel' );
+		$has_block     = function_exists( 'has_block' ) && (
+			has_block( 'clevers-product-carousel/carousel', $post ) ||
+			has_block( 'clevers/carousel', $post )
+		);
+
+		if ( ! $has_shortcode && ! $has_block ) {
+			return;
+		}
+
+		wp_enqueue_style( 'clv-slick' );
+		wp_enqueue_style( 'clv-slick-theme' );
+		wp_enqueue_style( 'clv-carousel' );
+		wp_enqueue_script( 'clv-slick' );
+		wp_enqueue_script( 'clv-carousel' );
 	}
 
 	public function shortcode( $atts ) {
