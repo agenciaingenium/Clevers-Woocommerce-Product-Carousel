@@ -77,6 +77,20 @@ El sistema cargará automáticamente tu versión.
 
 ---
 
+## 🪝 Hooks y filters para desarrolladores
+
+Puedes extender el plugin con los siguientes hooks principales:
+
+- `clevers_carousel_query_args` *(filter)*: modifica los argumentos de consulta de productos antes de ejecutar la query.
+- `clevers_carousel_template_path` *(filter)*: permite ajustar la ruta relativa de templates dentro de `templates/`.
+- `clevers_carousel_css_vars` *(filter)*: modifica el arreglo de variables CSS por carrusel antes de imprimirlas inline.
+- `clevers_carousel_before_render` *(action)*: se ejecuta justo antes de renderizar el template del carrusel.
+- `clevers_carousel_after_render` *(action)*: se ejecuta justo después de renderizar el template del carrusel.
+
+> Nota: También siguen disponibles los hooks con formato namespace como `clevers_carousel/query_args`, `clevers_carousel/before` y `clevers_carousel/after`.
+
+---
+
 ## 📷 Capturas
 
 1. Configuración del slider en el panel de administración.  

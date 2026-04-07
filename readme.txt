@@ -74,6 +74,17 @@ Each carousel includes color fields in the editor. You can also override CSS var
 }
 ```
 
+= Does the plugin provide hooks/filters for developers? =
+Yes. Main extension points:
+
+* `clevers_carousel_query_args` (filter): modify product query args before product lookup.
+* `clevers_carousel_template_path` (filter): override template relative path inside `templates/`.
+* `clevers_carousel_css_vars` (filter): adjust per-carousel CSS variables before inline output.
+* `clevers_carousel_before_render` (action): fires right before carousel template rendering.
+* `clevers_carousel_after_render` (action): fires right after carousel template rendering.
+
+Namespace variants such as `clevers_carousel/query_args`, `clevers_carousel/before`, and `clevers_carousel/after` are also available.
+
 == Screenshots ==
 1. Admin panel with carousel configuration fields.
 2. Example WooCommerce product carousel on the frontend.

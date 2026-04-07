@@ -143,12 +143,14 @@ class Clevers_Product_Carousel_Render {
 
 		ob_start();
 		do_action( 'clevers_carousel/before', $carousel_id, $settings, $products );
+		do_action( 'clevers_carousel_before_render', $carousel_id, $settings, $products );
 
 		$template_rel = 'carousels/carousel-' . (int) ( $settings['preset'] ?? 1 ) . '.php';
 		$template_rel = apply_filters( 'clevers_carousel/carousel_template_relpath', $template_rel, $carousel_id, $settings, $products );
 		include clevers_product_carousel_locate_template( $template_rel );
 
 		do_action( 'clevers_carousel/after', $carousel_id, $settings, $products );
+		do_action( 'clevers_carousel_after_render', $carousel_id, $settings, $products );
 		$html = (string) ob_get_clean();
 
 		$product = $original_product;
@@ -218,6 +220,11 @@ class Clevers_Product_Carousel_Render {
 			}
 
 			$vars[] = $css_var . ':' . $sanitized . ';';
+		}
+
+		$vars = apply_filters( 'clevers_carousel_css_vars', $vars, $carousel_id, $settings, $vars_map );
+		if ( ! is_array( $vars ) ) {
+			$vars = array();
 		}
 
 		if ( ! $vars ) {

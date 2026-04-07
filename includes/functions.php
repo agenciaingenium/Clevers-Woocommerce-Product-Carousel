@@ -83,6 +83,7 @@ function clevers_product_carousel_sanitize_css_value( $value ): string {
  */
 function clevers_product_carousel_locate_template( $rel_path ): string {
 	$rel_path  = ltrim( (string) $rel_path, '/' );
+	$rel_path  = apply_filters( 'clevers_carousel_template_path', $rel_path );
 	$theme_path = 'clevers-product-carousel/' . $rel_path;
 	$tpl        = locate_template( $theme_path );
 
@@ -128,7 +129,10 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
 		$args['include'] = $manual_product_ids;
 		$args['orderby'] = 'include';
 
-		return apply_filters( 'clevers_carousel/query_args', $args, $carousel_id, $meta );
+		$args = apply_filters( 'clevers_carousel/query_args', $args, $carousel_id, $meta );
+		$args = apply_filters( 'clevers_carousel_query_args', $args, $carousel_id, $meta );
+
+		return is_array( $args ) ? $args : array();
 	}
 
 	switch ( $orderby ) {
@@ -184,6 +188,7 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
 	}
 
 	$args = apply_filters( 'clevers_carousel/query_args', $args, $carousel_id, $meta );
+	$args = apply_filters( 'clevers_carousel_query_args', $args, $carousel_id, $meta );
 
 	return is_array( $args ) ? $args : array();
 }
