@@ -164,6 +164,8 @@ class Clevers_Product_Carousel_Admin {
 			'builder_init_delay_ms'    => (int) ( $meta['builder_init_delay_ms'] ?? 0 ),
 			'builder_disable_center_mode' => ! empty( $meta['builder_disable_center_mode'] ),
 		);
+		$queue_metrics = clevers_product_carousel_get_queue_metrics( (int) $post->ID );
+		$diag['queue_metrics'] = $queue_metrics;
 		?>
 		<p class="description"><?php esc_html_e( 'Quick environment and configuration checks for this carousel.', 'clevers-product-carousel' ); ?></p>
 		<ul style="margin:0 0 10px 16px; list-style:disc;">
@@ -171,6 +173,21 @@ class Clevers_Product_Carousel_Admin {
 			<li><?php echo esc_html( ! empty( $meta['builder_compat_mode'] ) ? __( 'Builder compatibility mode ON', 'clevers-product-carousel' ) : __( 'Builder compatibility mode OFF', 'clevers-product-carousel' ) ); ?></li>
 			<li><?php echo esc_html( sprintf( __( 'Manual IDs: %1$d (%2$d invalid)', 'clevers-product-carousel' ), count( $manual_ids ), count( $invalid_manual_ids ) ) ); ?></li>
 		</ul>
+		<div style="border:1px solid #dcdcde;border-radius:6px;padding:8px;margin-bottom:10px;background:#fff;">
+			<p style="margin:0 0 8px;"><strong><?php esc_html_e( 'Queue observability', 'clevers-product-carousel' ); ?></strong></p>
+			<ul style="margin:0 0 6px 16px;list-style:disc;">
+				<li><?php echo esc_html( sprintf( __( 'Pending: %d', 'clevers-product-carousel' ), (int) $queue_metrics['pending'] ) ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'Processed: %d', 'clevers-product-carousel' ), (int) $queue_metrics['processed'] ) ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'Failed: %d', 'clevers-product-carousel' ), (int) $queue_metrics['failed'] ) ); ?></li>
+				<li><?php echo esc_html( sprintf( __( 'Avg time per product: %sms', 'clevers-product-carousel' ), number_format_i18n( (float) $queue_metrics['avg_time_ms_per_product'], 2 ) ) ); ?></li>
+			</ul>
+			<?php if ( ! empty( $queue_metrics['last_error'] ) ) : ?>
+				<p style="margin:6px 0 0;color:#b32d2e;">
+					<strong><?php esc_html_e( 'Last error:', 'clevers-product-carousel' ); ?></strong>
+					<?php echo esc_html( $queue_metrics['last_error'] ); ?>
+				</p>
+			<?php endif; ?>
+		</div>
 		<textarea id="clv-diagnostic-report" class="widefat" rows="10" readonly><?php echo esc_textarea( wp_json_encode( $diag, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ); ?></textarea>
 		<p style="margin-top:8px;">
 			<button type="button" class="button button-secondary" id="clv-copy-diagnostic-report"><?php esc_html_e( 'Copy report', 'clevers-product-carousel' ); ?></button>

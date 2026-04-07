@@ -233,3 +233,68 @@ function clevers_product_carousel_get_settings( $carousel_id ) {
 
 	return apply_filters( 'clevers_carousel/settings', $settings, $carousel_id );
 }
+
+/**
+ * Obtiene métricas de procesamiento del carrusel.
+ *
+ * @param int $carousel_id ID del carrusel.
+ * @return array
+ */
+function clevers_product_carousel_get_queue_metrics( int $carousel_id ): array {
+	$defaults = array(
+		'pending'                 => 0,
+		'processed'               => 0,
+		'failed'                  => 0,
+		'avg_time_ms_per_product' => 0.0,
+		'last_error'              => '',
+		'last_run_at'             => '',
+	);
+
+	$stored = get_post_meta( $carousel_id, '_clv_queue_metrics', true );
+	if ( ! is_array( $stored ) ) {
+		return $defaults;
+	}
+
+	$metrics = wp_parse_args( $stored, $defaults );
+	$metrics['pending']   = max( 0, (int) $metrics['pending'] );
+	$metrics['processed'] = max( 0, (int) $metrics['processed'] );
+	$metrics['failed']    = max( 0, (int) $metrics['failed'] );
+	$metrics['avg_time_ms_per_product'] = max( 0, round( (float) $metrics['avg_time_ms_per_product'], 2 ) );
+	$metrics['last_error'] = sanitize_text_field( (string) $metrics['last_error'] );
+	$metrics['last_run_at'] = sanitize_text_field( (string) $metrics['last_run_at'] );
+
+	return $metrics;
+}
+
+/**
+ * Registra métricas del pipeline de render del carrusel.
+ *
+ * @param int    $carousel_id ID del carrusel.
+ * @param int    $pending Cantidad pendiente.
+ * @param int    $processed Cantidad procesada.
+ * @param int    $failed Cantidad fallida.
+ * @param float  $avg_time_ms_per_product Tiempo promedio por producto.
+ * @param string $last_error Último error.
+ * @return void
+ */
+function clevers_product_carousel_update_queue_metrics(
+	int $carousel_id,
+	int $pending,
+	int $processed,
+	int $failed,
+	float $avg_time_ms_per_product,
+	string $last_error = ''
+): void {
+	update_post_meta(
+		$carousel_id,
+		'_clv_queue_metrics',
+		array(
+			'pending'                 => max( 0, $pending ),
+			'processed'               => max( 0, $processed ),
+			'failed'                  => max( 0, $failed ),
+			'avg_time_ms_per_product' => max( 0, round( $avg_time_ms_per_product, 2 ) ),
+			'last_error'              => sanitize_text_field( $last_error ),
+			'last_run_at'             => gmdate( 'c' ),
+		)
+	);
+}

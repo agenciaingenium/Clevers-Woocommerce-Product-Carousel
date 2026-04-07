@@ -133,8 +133,10 @@ class Clevers_Product_Carousel_Render {
 			return (string) apply_filters( 'clevers_carousel/rendered_html', $html, $carousel_id, $settings, true );
 		}
 
-		$products = ( new WC_Product_Query( $args ) )->get_products();
-		$products = apply_filters( 'clevers_carousel/products', $products, $carousel_id, $args, $settings );
+		$start_time = microtime( true );
+		$products   = ( new WC_Product_Query( $args ) )->get_products();
+		$products   = apply_filters( 'clevers_carousel/products', $products, $carousel_id, $args, $settings );
+		$pending    = is_array( $products ) ? count( $products ) : 0;
 
 		// Save global product to restore later.
 		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
@@ -142,19 +144,43 @@ class Clevers_Product_Carousel_Render {
 		$original_product = $product;
 
 		ob_start();
-		do_action( 'clevers_carousel/before', $carousel_id, $settings, $products );
-		do_action( 'clevers_carousel_before_render', $carousel_id, $settings, $products );
+		try {
+			do_action( 'clevers_carousel/before', $carousel_id, $settings, $products );
+			do_action( 'clevers_carousel_before_render', $carousel_id, $settings, $products );
 
-		$template_rel = 'carousels/carousel-' . (int) ( $settings['preset'] ?? 1 ) . '.php';
-		$template_rel = apply_filters( 'clevers_carousel/carousel_template_relpath', $template_rel, $carousel_id, $settings, $products );
-		include clevers_product_carousel_locate_template( $template_rel );
+			$template_rel = 'carousels/carousel-' . (int) ( $settings['preset'] ?? 1 ) . '.php';
+			$template_rel = apply_filters( 'clevers_carousel/carousel_template_relpath', $template_rel, $carousel_id, $settings, $products );
+			include clevers_product_carousel_locate_template( $template_rel );
 
-		do_action( 'clevers_carousel/after', $carousel_id, $settings, $products );
-		do_action( 'clevers_carousel_after_render', $carousel_id, $settings, $products );
-		$html = (string) ob_get_clean();
+			do_action( 'clevers_carousel/after', $carousel_id, $settings, $products );
+			do_action( 'clevers_carousel_after_render', $carousel_id, $settings, $products );
+			$html = (string) ob_get_clean();
+		} catch ( Throwable $e ) {
+			ob_end_clean();
+			$elapsed_ms = max( 0, ( microtime( true ) - $start_time ) * 1000 );
+			clevers_product_carousel_update_queue_metrics(
+				$carousel_id,
+				$pending,
+				0,
+				max( 1, $pending ),
+				$pending > 0 ? ( $elapsed_ms / $pending ) : $elapsed_ms,
+				$e->getMessage()
+			);
+			$product = $original_product;
+			return '';
+		}
 
 		$product = $original_product;
 		// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+		$elapsed_ms = max( 0, ( microtime( true ) - $start_time ) * 1000 );
+		clevers_product_carousel_update_queue_metrics(
+			$carousel_id,
+			0,
+			$pending,
+			0,
+			$pending > 0 ? ( $elapsed_ms / $pending ) : $elapsed_ms
+		);
 
 		$cache_ttl = (int) apply_filters( 'clevers_carousel/cache_ttl', 10 * MINUTE_IN_SECONDS, $carousel_id, $settings, $args );
 		set_transient( $cache_key, $html, max( MINUTE_IN_SECONDS, $cache_ttl ) );
