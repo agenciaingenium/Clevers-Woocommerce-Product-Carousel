@@ -76,7 +76,13 @@ function wp_parse_args( $args, $defaults ) { return array_merge( $defaults, (arr
 function wp_json_encode( $value ) { return json_encode( $value ); }
 function wp_unslash( $value ) { return stripslashes( (string) $value ); }
 function wp_get_referer() { return $GLOBALS['mock_state']['referer']; }
+
+function __( $text, $domain = null ) { unset( $domain ); return $text; }
+function current_user_can( $cap ) { unset( $cap ); return true; }
+function delete_transient( $key ) { unset( $GLOBALS['mock_state']['transients'][ $key ] ); return true; }
+function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function wp_upload_dir() { return array( 'basedir' => sys_get_temp_dir() ); }
 function apply_filters( $hook, $value ) {
 	$args = func_get_args();
 	array_shift( $args );
@@ -104,3 +110,5 @@ function get_post_type( $id ) { return $GLOBALS['mock_state']['posts'][ $id ]->p
 
 require_once dirname( __DIR__ ) . '/includes/functions.php';
 require_once dirname( __DIR__ ) . '/includes/class-render.php';
+
+require_once dirname( __DIR__ ) . '/includes/class-health-check.php';
