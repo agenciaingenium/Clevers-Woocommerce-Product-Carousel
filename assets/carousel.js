@@ -1,7 +1,10 @@
 (function ($) {
-  var retryTimer = null;
-  var retryAttempts = 0;
-  var maxRetryAttempts = 30;
+  var RETRY_BASE_DELAY = 250;
+  var RETRY_MAX_DELAY = 8000;
+  var RETRY_MAX_ATTEMPTS = 6;
+  var DEAD_LETTER_MAX_ITEMS = 100;
+  var retryRegistry = {};
+  var deadLetterQueue = [];
 
   function boolData($el, key, fallback) {
     var raw = $el.data(key);
@@ -42,100 +45,189 @@
     });
   }
 
+  function getCarouselId($el) {
+    return String(
+      $el.attr('id') ||
+      $el.data('carousel-id') ||
+      $el.closest('.clevers-product-carousel').attr('id') ||
+      ('carousel-' + $el.index())
+    );
+  }
+
+  function getOrCreateRetryState(carouselId) {
+    if (!retryRegistry[carouselId]) {
+      retryRegistry[carouselId] = {
+        attempts: 0,
+        timer: null,
+        deadLettered: false,
+        deadLetterLogged: false
+      };
+    }
+
+    return retryRegistry[carouselId];
+  }
+
+  function clearRetryState(state) {
+    if (state.timer) {
+      window.clearTimeout(state.timer);
+      state.timer = null;
+    }
+
+    state.attempts = 0;
+    state.deadLettered = false;
+    state.deadLetterLogged = false;
+  }
+
+  function markDeadLetter(carouselId, state, reason) {
+    state.deadLettered = true;
+    if (state.timer) {
+      window.clearTimeout(state.timer);
+      state.timer = null;
+    }
+
+    deadLetterQueue.push({
+      carouselId: carouselId,
+      reason: reason,
+      attempts: state.attempts,
+      timestamp: new Date().toISOString()
+    });
+
+    if (deadLetterQueue.length > DEAD_LETTER_MAX_ITEMS) {
+      deadLetterQueue.shift();
+    }
+  }
+
+  function scheduleRetry(carouselId, state, retryFn, reason) {
+    if (state.deadLettered || state.timer) return;
+
+    if (state.attempts >= RETRY_MAX_ATTEMPTS) {
+      markDeadLetter(carouselId, state, reason);
+      return;
+    }
+
+    state.attempts += 1;
+
+    var expDelay = Math.min(RETRY_BASE_DELAY * Math.pow(2, state.attempts - 1), RETRY_MAX_DELAY);
+    var jitter = Math.round(Math.random() * (expDelay * 0.3));
+    var delay = expDelay + jitter;
+
+    state.timer = window.setTimeout(function () {
+      state.timer = null;
+      retryFn();
+    }, delay);
+  }
+
+  function initSingleCarousel($el) {
+    var carouselId = getCarouselId($el);
+    var retryState = getOrCreateRetryState(carouselId);
+
+    if (retryState.deadLettered) {
+      if (!retryState.deadLetterLogged) {
+        retryState.deadLetterLogged = true;
+        console.warn('Clevers Product Carousel: skipped dead-lettered carousel', carouselId);
+      }
+      return;
+    }
+
+    if ($el.hasClass('slick-initialized')) {
+      clearRetryState(retryState);
+      labelSlickControls($el);
+      return;
+    }
+
+    if (typeof $el.slick !== 'function') {
+      console.warn('Clevers Product Carousel: Slick not loaded');
+      scheduleRetry(carouselId, retryState, function () {
+        initSingleCarousel($el);
+      }, 'slick-not-loaded');
+      return;
+    }
+
+    var slides = Math.max(1, intData($el, 'slides', 4));
+    var slidesTablet = Math.max(1, intData($el, 'slides-tablet', Math.min(slides, 2)));
+    var slidesMobile = Math.max(1, intData($el, 'slides-mobile', 1));
+    var autoplay = boolData($el, 'autoplay', false);
+    var speed = Math.max(500, intData($el, 'speed', 3000));
+    var dots = boolData($el, 'dots', false);
+    var arrows = boolData($el, 'arrows', true);
+    var centerMode = boolData($el, 'center', false);
+    var pauseOnHover = boolData($el, 'pause-on-hover', true);
+    var pauseOnFocus = boolData($el, 'pause-on-focus', true);
+    var respectReducedMotion = boolData($el, 'reduced-motion', true);
+    var builderCompat = boolData($el, 'builder-compat', false);
+    var builderDelay = Math.max(0, intData($el, 'builder-delay', 0));
+    var disableCenterOnBuilder = boolData($el, 'disable-center-on-builder', false);
+
+    if (builderCompat && disableCenterOnBuilder && inBuilderContext($el)) {
+      centerMode = false;
+    }
+
+    if (autoplay && respectReducedMotion && prefersReducedMotion()) {
+      autoplay = false;
+    }
+
+    $el.attr('aria-live', autoplay ? 'off' : 'polite');
+
+    $el.on('init', function () {
+      labelSlickControls($el);
+    });
+
+    $el.on('afterChange', function () {
+      labelSlickControls($el);
+    });
+
+    var initSlick = function () {
+      if ($el.hasClass('slick-initialized')) {
+        clearRetryState(retryState);
+        labelSlickControls($el);
+        return;
+      }
+
+      try {
+        $el.slick({
+          slidesToShow: slides,
+          slidesToScroll: 1,
+          autoplay: autoplay,
+          autoplaySpeed: speed,
+          dots: dots,
+          arrows: arrows,
+          centerMode: centerMode,
+          pauseOnHover: pauseOnHover,
+          pauseOnFocus: pauseOnFocus,
+          accessibility: true,
+          adaptiveHeight: false,
+          lazyLoad: 'ondemand',
+          rtl: $('html').attr('dir') === 'rtl',
+          responsive: [
+            { breakpoint: 1024, settings: { slidesToShow: slidesTablet } },
+            { breakpoint: 768, settings: { slidesToShow: slidesMobile } },
+            { breakpoint: 480, settings: { slidesToShow: 1 } }
+          ]
+        });
+        clearRetryState(retryState);
+      } catch (err) {
+        var reason = err && err.message ? err.message : 'slick-init-failed';
+        scheduleRetry(carouselId, retryState, function () {
+          initSingleCarousel($el);
+        }, reason);
+      }
+    };
+
+    if (builderCompat && builderDelay > 0) {
+      window.setTimeout(initSlick, builderDelay);
+    } else {
+      initSlick();
+    }
+  }
+
   function initCleversSliders(ctx) {
     var $wraps = $('.clevers-product-carousel .slick-carousel', ctx || document);
     if (!$wraps.length) return;
 
     $wraps.each(function () {
       var $el = $(this);
-      if ($el.hasClass('slick-initialized')) {
-        labelSlickControls($el);
-        return;
-      }
-
-      if (typeof $el.slick !== 'function') {
-        console.warn('Clevers Product Carousel: Slick not loaded');
-        scheduleRetry();
-        return;
-      }
-
-      var slides = Math.max(1, intData($el, 'slides', 4));
-      var slidesTablet = Math.max(1, intData($el, 'slides-tablet', Math.min(slides, 2)));
-      var slidesMobile = Math.max(1, intData($el, 'slides-mobile', 1));
-      var autoplay = boolData($el, 'autoplay', false);
-      var speed = Math.max(500, intData($el, 'speed', 3000));
-      var dots = boolData($el, 'dots', false);
-      var arrows = boolData($el, 'arrows', true);
-      var centerMode = boolData($el, 'center', false);
-      var pauseOnHover = boolData($el, 'pause-on-hover', true);
-      var pauseOnFocus = boolData($el, 'pause-on-focus', true);
-      var respectReducedMotion = boolData($el, 'reduced-motion', true);
-      var builderCompat = boolData($el, 'builder-compat', false);
-      var builderDelay = Math.max(0, intData($el, 'builder-delay', 0));
-      var disableCenterOnBuilder = boolData($el, 'disable-center-on-builder', false);
-
-      if (builderCompat && disableCenterOnBuilder && inBuilderContext($el)) {
-        centerMode = false;
-      }
-
-      if (autoplay && respectReducedMotion && prefersReducedMotion()) {
-        autoplay = false;
-      }
-
-      $el.attr('aria-live', autoplay ? 'off' : 'polite');
-
-      $el.on('init', function () {
-        labelSlickControls($el);
-      });
-
-      $el.on('afterChange', function () {
-        labelSlickControls($el);
-      });
-
-      var initSlick = function () {
-        if ($el.hasClass('slick-initialized')) {
-          labelSlickControls($el);
-          return;
-        }
-
-        $el.slick({
-        slidesToShow: slides,
-        slidesToScroll: 1,
-        autoplay: autoplay,
-        autoplaySpeed: speed,
-        dots: dots,
-        arrows: arrows,
-        centerMode: centerMode,
-        pauseOnHover: pauseOnHover,
-        pauseOnFocus: pauseOnFocus,
-        accessibility: true,
-        adaptiveHeight: false,
-        lazyLoad: 'ondemand',
-        rtl: $('html').attr('dir') === 'rtl',
-        responsive: [
-          { breakpoint: 1024, settings: { slidesToShow: slidesTablet } },
-          { breakpoint: 768, settings: { slidesToShow: slidesMobile } },
-          { breakpoint: 480, settings: { slidesToShow: 1 } }
-        ]
-        });
-      };
-
-      if (builderCompat && builderDelay > 0) {
-        window.setTimeout(initSlick, builderDelay);
-      } else {
-        initSlick();
-      }
+      initSingleCarousel($el);
     });
-  }
-
-  function scheduleRetry() {
-    if (retryTimer || retryAttempts >= maxRetryAttempts) return;
-
-    retryAttempts += 1;
-    retryTimer = window.setTimeout(function () {
-      retryTimer = null;
-      initCleversSliders(document);
-    }, Math.min(250 * retryAttempts, 1500));
   }
 
   $(function () {
@@ -144,8 +236,11 @@
 
   // Expose a manual hook for builders/console debugging.
   window.CleversProductCarouselInit = function (ctx) {
-    retryAttempts = 0;
     initCleversSliders(ctx || document);
+  };
+
+  window.CleversProductCarouselDeadLetterQueue = function () {
+    return deadLetterQueue.slice();
   };
 
   // Builders like Brizy inject modules after DOM ready; observe and re-init.
