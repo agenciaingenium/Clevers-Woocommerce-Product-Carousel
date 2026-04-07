@@ -57,6 +57,50 @@ jobs:
           HEADER_VERSION=$(grep -Ei '^[[:space:]]*[*#/]{0,2}[[:space:]]*Version:[[:space:]]*[0-9]+([.][0-9]+){1,3}' -m1 "$MAIN_FILE" | sed -E 's/.*Version:[[:space:]]*([0-9]+([.][0-9]+){1,3}).*/\1/' || true)
           [ "$HEADER_VERSION" = "${{ inputs.version }}" ] || { echo "::error::Header version mismatch: $HEADER_VERSION"; exit 1; }
 
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' php_files < <(find . -type f -name '*.php' -not -path './.git/*' -print0)
+          [ "${#php_files[@]}" -gt 0 ] || { echo "::error::No PHP files found to lint"; exit 1; }
+
+          for file in "${php_files[@]}"; do
+            php -l "$file"
+          done
+
+      - name: Smoke test plugin bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAIN_FILE=$(php -r '$files=glob("*.php"); foreach($files as $f){$c=file_get_contents($f); if(strpos($c,"Plugin Name:")!==false){echo $f; break;}}')
+          [ -n "$MAIN_FILE" ] || { echo "::error::Could not detect plugin main file"; exit 1; }
+          export MAIN_FILE
+
+          php <<'PHP'
+          <?php
+          $mainFile = getenv('MAIN_FILE') ?: '';
+          if ('' === $mainFile || ! file_exists($mainFile)) {
+            fwrite(STDERR, "Plugin main file missing for smoke test\n");
+            exit(1);
+          }
+
+          if (! defined('ABSPATH')) {
+            define('ABSPATH', __DIR__ . '/');
+          }
+
+          function plugin_dir_path($file) { return dirname($file) . '/'; }
+          function plugin_dir_url($file) { return 'https://example.test/' . basename(dirname($file)) . '/'; }
+          function is_admin() { return false; }
+          function add_action($hook, $callback, $priority = 10, $accepted_args = 1) { return true; }
+          function add_filter($hook, $callback, $priority = 10, $accepted_args = 1) { return true; }
+          function add_shortcode($tag, $callback) { return true; }
+
+          require_once $mainFile;
+
+          echo "Plugin loaded successfully\n";
+          PHP
+
       - name: Commit version bump
         shell: bash
         run: |
