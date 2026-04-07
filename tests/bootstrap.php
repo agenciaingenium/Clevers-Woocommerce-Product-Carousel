@@ -20,6 +20,8 @@ $GLOBALS['mock_state'] = array(
 	'referer'               => '',
 	'product_ids_on_sale'   => array(),
 	'featured_product_ids'  => array(),
+	'actions'               => array(),
+	'shortcodes'            => array(),
 );
 
 function reset_mock_state() {
@@ -33,6 +35,8 @@ function reset_mock_state() {
 	$GLOBALS['mock_state']['referer'] = '';
 	$GLOBALS['mock_state']['product_ids_on_sale'] = array();
 	$GLOBALS['mock_state']['featured_product_ids'] = array();
+	$GLOBALS['mock_state']['actions'] = array();
+	$GLOBALS['mock_state']['shortcodes'] = array();
 
 	$_REQUEST = array();
 	WC_Product_Query::$construct_count = 0;
@@ -87,7 +91,11 @@ function apply_filters( $hook, $value ) {
 	return $value;
 }
 function add_filter( $hook, $callback ) { $GLOBALS['mock_state']['filters'][ $hook ][] = $callback; return true; }
+function add_action( $hook, $callback ) { $GLOBALS['mock_state']['actions'][ $hook ][] = $callback; return true; }
+function add_shortcode( $tag, $callback ) { $GLOBALS['mock_state']['shortcodes'][ $tag ] = $callback; return true; }
 function do_action( $hook ) { unset( $hook ); }
+function plugin_dir_path( $file ) { return dirname( $file ) . '/'; }
+function plugin_dir_url( $file ) { return 'https://example.test/' . basename( dirname( $file ) ) . '/'; }
 function locate_template( $template ) { unset( $template ); return $GLOBALS['mock_state']['locate_template_value']; }
 function shortcode_atts( $pairs, $atts ) { return array_merge( $pairs, (array) $atts ); }
 function is_admin() { return false; }

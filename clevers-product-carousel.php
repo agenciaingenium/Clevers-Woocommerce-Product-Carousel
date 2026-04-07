@@ -22,9 +22,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 // -----------------------------------------------------------------------------
 //  Constantes
 // -----------------------------------------------------------------------------
-const CLV_SLUG = 'clevers_carousel';
-define( 'CLV_DIR', plugin_dir_path( __FILE__ ) );
-define( 'CLV_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'CLV_SLUG' ) ) {
+	define( 'CLV_SLUG', 'clevers_carousel' );
+}
+
+if ( ! defined( 'CLV_DIR' ) ) {
+	define( 'CLV_DIR', plugin_dir_path( __FILE__ ) );
+}
+
+if ( ! defined( 'CLV_URL' ) ) {
+	define( 'CLV_URL', plugin_dir_url( __FILE__ ) );
+}
 
 // -----------------------------------------------------------------------------
 //  Includes & Init
