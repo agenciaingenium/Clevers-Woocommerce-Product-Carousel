@@ -125,6 +125,17 @@ clevers-product-carousel/
 
 ---
 
+## 📒 Changelog
+
+### 1.2.3
+
+- Enhanced Brizy editor integration.
+- Refined JSON import flow.
+- Improved frontend fallback behavior.
+- Added Gutenberg block support improvements.
+- Added REST API endpoints for carousel operations.
+- Enhanced admin tools and management UX.
+
 ## 📜 Licencia
 
 GPLv2 o posterior  
