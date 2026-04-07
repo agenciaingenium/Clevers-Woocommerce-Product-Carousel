@@ -45,6 +45,10 @@ jobs:
         if: hashFiles('composer.json') != ''
         run: composer install --no-dev --prefer-dist --no-interaction --no-progress
 
+      - name: Composer dependency security audit
+        if: hashFiles('composer.lock') != ''
+        run: composer audit --locked --no-interaction
+
       - name: NPM install
         if: hashFiles('package.json') != ''
         run: npm ci
