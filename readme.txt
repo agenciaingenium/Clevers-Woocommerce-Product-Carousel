@@ -82,6 +82,14 @@ Each carousel includes color fields in the editor. You can also override CSS var
 
 == Changelog ==
 
+= 1.2.3 =
+* Enhanced Brizy editor integration.
+* Refined JSON import flow.
+* Improved frontend fallback behavior.
+* Added Gutenberg block support improvements.
+* Added REST API endpoints for carousel operations.
+* Enhanced admin tools and management UX.
+
 = 1.2.1 =
 * Added Gutenberg block for selecting saved carousels.
 * Improved admin UI (sorting, categories selector, shortcode box, preset preview).
@@ -104,6 +112,9 @@ Each carousel includes color fields in the editor. You can also override CSS var
 * Initial release with WooCommerce product carousel support.
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+Brizy integration, JSON import, frontend fallback, Gutenberg, REST API, and admin tool enhancements.
 
 = 1.2.1 =
 Feature, admin UX, caching and accessibility improvements.
