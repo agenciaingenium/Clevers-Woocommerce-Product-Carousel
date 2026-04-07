@@ -91,6 +91,16 @@ Puedes extender el plugin con los siguientes hooks principales:
 
 ---
 
+
+## 🔒 Política de merges en `main`
+
+Para mantener un historial limpio y auditable:
+
+- `main` debe aceptar cambios **solo vía Pull Request**.
+- Configura el repositorio para permitir únicamente **Squash merge** o **Rebase merge**.
+- Evita merges tipo `Create a merge commit` (incluye merges de ramas remote-tracking).
+- Marca como requerido el workflow **Main History Guard** para bloquear pushes directos a `main`.
+
 ## 📷 Capturas
 
 1. Configuración del slider en el panel de administración.  
