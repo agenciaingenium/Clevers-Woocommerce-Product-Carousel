@@ -39,4 +39,51 @@ final class RenderTest extends TestCase {
 		$this->assertSame( 1, WC_Product_Query::$construct_count );
 		$this->assertNotEmpty( $GLOBALS['mock_state']['set_transients'] );
 	}
+
+	public function test_render_block_matches_regression_snapshot(): void {
+		$post = new WP_Post();
+		$post->post_type = CLV_SLUG;
+		$GLOBALS['mock_state']['posts'][31] = $post;
+		$GLOBALS['mock_state']['post_meta'][31] = array();
+		$GLOBALS['mock_state']['locate_template_value'] = dirname( __DIR__ ) . '/fixtures/render-regression-template.php';
+
+		$renderer = new Clevers_Product_Carousel_Render();
+		$html = $renderer->render_block( array( 'carouselId' => 31 ) );
+
+		$this->assertMatchesHtmlSnapshot( 'render-block-default.html', $html );
+	}
+
+	public function test_render_block_brizy_preview_matches_regression_snapshot(): void {
+		$_REQUEST['action'] = 'brizy_in-front-editor';
+
+		$post = new WP_Post();
+		$post->post_type = CLV_SLUG;
+		$GLOBALS['mock_state']['posts'][32] = $post;
+		$GLOBALS['mock_state']['post_meta'][32] = array();
+		$GLOBALS['mock_state']['locate_template_value'] = dirname( __DIR__ ) . '/fixtures/render-regression-template.php';
+
+		$renderer = new Clevers_Product_Carousel_Render();
+		$html = $renderer->render_block( array( 'carouselId' => 32 ) );
+
+		$this->assertMatchesHtmlSnapshot( 'render-block-brizy-preview.html', $html );
+	}
+
+	private function assertMatchesHtmlSnapshot( string $snapshot_name, string $actual_html ): void {
+		$snapshot_path = dirname( __DIR__ ) . '/fixtures/snapshots/' . $snapshot_name;
+		$this->assertFileExists( $snapshot_path, 'Missing snapshot: ' . $snapshot_name );
+
+		$expected_html = (string) file_get_contents( $snapshot_path );
+		$this->assertSame(
+			$this->normalizeHtml( $expected_html ),
+			$this->normalizeHtml( $actual_html ),
+			'Snapshot mismatch for ' . $snapshot_name
+		);
+	}
+
+	private function normalizeHtml( string $html ): string {
+		$html = str_replace( array( "\r\n", "\r" ), "\n", trim( $html ) );
+		$html = preg_replace( '/>\s+</', '><', $html );
+
+		return (string) $html;
+	}
 }
