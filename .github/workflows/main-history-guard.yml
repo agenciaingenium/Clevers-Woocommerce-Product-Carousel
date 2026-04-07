@@ -1,0 +1,90 @@
+name: Main History Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  block-merge-commits:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fail if PR contains merge commits
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          MERGE_COMMITS=$(git rev-list --merges "origin/${{ github.base_ref }}..HEAD")
+
+          if [ -n "$MERGE_COMMITS" ]; then
+            echo "❌ This pull request contains merge commits."
+            echo "Use rebase (or squash) to keep main history linear and auditable."
+            echo
+            echo "$MERGE_COMMITS"
+            exit 1
+          fi
+
+          echo "✅ No merge commits detected in this pull request."
+
+  enforce-pr-origin:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate pushed commits come from merged PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commits = context.payload.commits || [];
+            const ignoredPrefixes = ['dependabot[bot]', 'github-actions[bot]'];
+
+            if (commits.length === 0) {
+              core.info('No commits in push payload; skipping.');
+              return;
+            }
+
+            for (const commit of commits) {
+              const sha = commit.id;
+              core.info(`Checking commit ${sha}`);
+
+              const prs = await github.request(
+                'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  commit_sha: sha,
+                  mediaType: {
+                    previews: ['groot']
+                  }
+                }
+              );
+
+              if (prs.data.length > 0) {
+                core.info(`✅ Commit ${sha} is linked to PR(s): ${prs.data.map(pr => `#${pr.number}`).join(', ')}`);
+                continue;
+              }
+
+              const author = commit.author?.username || commit.author?.name || 'unknown';
+              if (ignoredPrefixes.includes(author)) {
+                core.info(`ℹ️ Commit ${sha} by ${author} is ignored.`);
+                continue;
+              }
+
+              core.setFailed(
+                `Commit ${sha} is not associated with a merged pull request. ` +
+                'Direct pushes to main are not allowed; use PR + squash/rebase merge.'
+              );
+              return;
+            }
+
+            core.info('✅ All commits are associated with merged pull requests.');
