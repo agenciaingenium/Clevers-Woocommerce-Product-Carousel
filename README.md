@@ -101,6 +101,24 @@ Para mantener un historial limpio y auditable:
 - Evita merges tipo `Create a merge commit` (incluye merges de ramas remote-tracking).
 - Marca como requerido el workflow **Main History Guard** para bloquear pushes directos a `main`.
 
+---
+
+## 🛠️ Preflight operativo (OpenClaw runbooks)
+
+Para validar el error intermitente de `status-all` relacionado con referencias rotas de Telegram (`channel.setup.js` faltante), se incluye un preflight:
+
+```bash
+php bin/openclaw-preflight.php
+```
+
+Opcionalmente puedes pasar una ruta de config distinta:
+
+```bash
+php bin/openclaw-preflight.php /ruta/a/openclaw.json
+```
+
+El comando revisa `openclaw.json`, detecta referencias a Telegram que no existen en disco y devuelve un código no-cero si encuentra rutas rotas.
+
 ## 📷 Capturas
 
 1. Configuración del slider en el panel de administración.  
