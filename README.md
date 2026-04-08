@@ -8,6 +8,8 @@
 ![WooCommerce Compatible](https://img.shields.io/badge/WooCommerce-Compatible-success?logo=woocommerce)
 ![License](https://img.shields.io/badge/license-GPLv2-orange)
 ![Version](https://img.shields.io/badge/version-1.2.1-blue)
+[![CI](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/php-compatibility.yml/badge.svg)](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/php-compatibility.yml)
+[![Release](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/create_release.yml/badge.svg)](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/create_release.yml)
 
 ---
 
