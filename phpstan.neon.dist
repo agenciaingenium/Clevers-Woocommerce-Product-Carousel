@@ -1,0 +1,11 @@
+parameters:
+  level: 1
+  paths:
+    - clevers-product-carousel.php
+    - includes
+  bootstrapFiles:
+    - tests/bootstrap.php
+  excludePaths:
+    - */includes/class-admin.php
+    - */includes/class-cpt.php
+    - */includes/class-health-check.php
