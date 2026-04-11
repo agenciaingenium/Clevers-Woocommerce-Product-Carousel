@@ -61,6 +61,65 @@ Cada carrusel permite configurar:
 
 ---
 
+
+## 🛠️ Configuración operativa (soporte técnico)
+
+Esta guía está pensada para operación en sitios con catálogos medianos/grandes y para equipos de soporte.
+
+### 1) Límites por lote (batch)
+
+Aunque el carrusel no usa una cola asíncrona dedicada, el “lote” real de trabajo por render es la cantidad de productos que devuelve la consulta.
+
+- **Recomendado para producción:** 8–24 productos por carrusel.
+- **Catálogos grandes o hosting compartido:** empezar con 8–12.
+- **Servidor dedicado / buen caché de objetos:** 24–36 si el TTFB se mantiene estable.
+
+Buenas prácticas:
+- Evita configurar múltiples carruseles en una misma vista con lotes altos al mismo tiempo.
+- Prioriza filtros concretos (categoría, destacados, ofertas) para reducir consultas amplias.
+- Ajusta el TTL del caché si necesitas reducir recomputación:
+
+```php
+add_filter( 'clevers_carousel/cache_ttl', function( $ttl, $carousel_id ) {
+	// 15 minutos.
+	return 15 * MINUTE_IN_SECONDS;
+}, 10, 2 );
+```
+
+### 2) Cron recomendado
+
+El plugin invalida caché cuando cambia producto/términos/meta y también en `woocommerce_scheduled_sales`.
+Para entornos de alto tráfico, evita depender solo del tráfico web para disparar WP-Cron.
+
+**Recomendación operativa:**
+1. Desactivar cron interno en `wp-config.php`:
+
+```php
+define( 'DISABLE_WP_CRON', true );
+```
+
+2. Configurar cron de sistema cada **5 minutos**:
+
+```bash
+*/5 * * * * php /ruta/a/wordpress/wp-cron.php > /dev/null 2>&1
+```
+
+Si tu tienda tiene cambios de precio/ofertas muy frecuentes, puedes bajar a cada 1–2 minutos.
+
+### 3) Troubleshooting de cola (métricas de pipeline)
+
+El plugin registra métricas por carrusel (`pending`, `processed`, `failed`, `avg_time_ms_per_product`, `last_error`, `last_run_at`) y las muestra en el panel admin del carrusel.
+
+Checklist rápido de soporte:
+- **`failed > 0`**: revisar `last_error` y logs PHP (`debug.log` o logs del servidor).
+- **`avg_time_ms_per_product` alto**: reducir lote, aplicar filtros más específicos y revisar rendimiento de WooCommerce/DB.
+- **`pending` no baja / render vacío**: validar estado de WooCommerce y plantillas sobrescritas en el tema.
+- **Invalidación irregular de datos**: confirmar que WP-Cron está ejecutando correctamente y que no está bloqueado por cachés de página agresivos.
+
+Si necesitas inspección técnica puntual, puedes leer las métricas desde meta del post del carrusel (`_clv_queue_metrics`) para diagnóstico remoto.
+
+---
+
 ## 🧠 Sobrescribir plantillas
 
 Para personalizar la vista sin tocar el plugin:
