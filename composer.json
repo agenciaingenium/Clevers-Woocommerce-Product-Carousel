@@ -1,0 +1,22 @@
+{
+  "name": "clevers/woocommerce-product-carousel",
+  "description": "Clevers WooCommerce Product Carousel plugin",
+  "type": "project",
+  "require": {},
+  "require-dev": {
+    "phpstan/phpstan": "^1.12",
+    "phpunit/phpunit": "^9.6"
+  },
+  "scripts": {
+    "lint:php": "find . -type f -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l",
+    "lint:static": "phpstan analyse --configuration=phpstan.neon.dist --no-progress",
+    "lint": [
+      "@lint:php",
+      "@lint:static"
+    ],
+    "test": "phpunit --configuration phpunit.xml.dist"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
