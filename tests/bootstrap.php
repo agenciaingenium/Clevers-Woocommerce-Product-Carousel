@@ -2,6 +2,9 @@
 
 define( 'ABSPATH', __DIR__ );
 define( 'CLV_DIR', dirname( __DIR__ ) . '/' );
+if ( ! defined( 'CLV_URL' ) ) {
+	define( 'CLV_URL', 'https://example.test/clevers-product-carousel/' );
+}
 if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
 	define( 'MINUTE_IN_SECONDS', 60 );
 }
@@ -65,12 +68,32 @@ class WC_Product_Query {
 }
 
 function get_post_meta( $id, $key = '', $single = false ) {
-	unset( $key, $single );
-	return $GLOBALS['mock_state']['post_meta'][ $id ] ?? array();
+	if ( '' === $key ) {
+		return $GLOBALS['mock_state']['post_meta'][ $id ] ?? array();
+	}
+
+	$entry = $GLOBALS['mock_state']['post_meta'][ $id ] ?? array();
+	$value = $entry[ $key ] ?? null;
+	if ( null === $value && '_clv_settings' === $key && is_array( $entry ) ) {
+		// Backward compatibility for tests that store settings directly by post ID.
+		$value = $entry;
+	}
+	if ( $single ) {
+		return $value;
+	}
+
+	return null === $value ? array() : array( $value );
 }
 function get_post( $id ) { return $GLOBALS['mock_state']['posts'][ $id ] ?? null; }
 function get_option( $name, $default = false ) { return $GLOBALS['mock_state']['options'][ $name ] ?? $default; }
 function update_option( $name, $value, $autoload = false ) { unset( $autoload ); $GLOBALS['mock_state']['options'][ $name ] = $value; return true; }
+function update_post_meta( $id, $key, $value ) {
+	if ( ! isset( $GLOBALS['mock_state']['post_meta'][ $id ] ) || ! is_array( $GLOBALS['mock_state']['post_meta'][ $id ] ) ) {
+		$GLOBALS['mock_state']['post_meta'][ $id ] = array();
+	}
+	$GLOBALS['mock_state']['post_meta'][ $id ][ $key ] = $value;
+	return true;
+}
 function get_transient( $key ) { return $GLOBALS['mock_state']['transients'][ $key ] ?? false; }
 function set_transient( $key, $value, $ttl ) { $GLOBALS['mock_state']['set_transients'][ $key ] = array( 'value' => $value, 'ttl' => $ttl ); return true; }
 function sanitize_text_field( $value ) { return trim( (string) $value ); }
@@ -86,6 +109,8 @@ function current_user_can( $cap ) { unset( $cap ); return true; }
 function delete_transient( $key ) { unset( $GLOBALS['mock_state']['transients'][ $key ] ); return true; }
 function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path = false ) { unset( $domain, $deprecated, $plugin_rel_path ); return true; }
+function plugin_basename( $file ) { return basename( dirname( $file ) ) . '/' . basename( $file ); }
 function wp_upload_dir() { return array( 'basedir' => sys_get_temp_dir() ); }
 function apply_filters( $hook, $value ) {
 	$args = func_get_args();
@@ -97,9 +122,9 @@ function apply_filters( $hook, $value ) {
 	return $value;
 }
 function add_filter( $hook, $callback ) { $GLOBALS['mock_state']['filters'][ $hook ][] = $callback; return true; }
-function add_action( $hook, $callback ) { $GLOBALS['mock_state']['actions'][ $hook ][] = $callback; return true; }
+function add_action( $hook, $callback, ...$args ) { unset( $args ); $GLOBALS['mock_state']['actions'][ $hook ][] = $callback; return true; }
 function add_shortcode( $tag, $callback ) { $GLOBALS['mock_state']['shortcodes'][ $tag ] = $callback; return true; }
-function do_action( $hook ) { unset( $hook ); }
+function do_action( $hook, ...$args ) { unset( $hook, $args ); }
 function plugin_dir_path( $file ) { return dirname( $file ) . '/'; }
 function plugin_dir_url( $file ) { return 'https://example.test/' . basename( dirname( $file ) ) . '/'; }
 function locate_template( $template ) { unset( $template ); return $GLOBALS['mock_state']['locate_template_value']; }
@@ -111,12 +136,22 @@ function has_shortcode( $content, $tag ) { unset( $content, $tag ); return false
 function has_block( $name, $post = null ) { unset( $name, $post ); return false; }
 function wp_enqueue_style( $handle ) { unset( $handle ); }
 function wp_enqueue_script( $handle ) { unset( $handle ); }
+function wp_register_script( $handle, $src, $deps = array(), $ver = false, $in_footer = false ) { unset( $handle, $src, $deps, $ver, $in_footer ); return true; }
 function wp_add_inline_style( $handle, $css ) { unset( $handle, $css ); }
+function register_activation_hook( $file, $callback ) { unset( $file, $callback ); return true; }
 function wc_get_product_ids_on_sale() { return $GLOBALS['mock_state']['product_ids_on_sale']; }
 function wc_get_featured_product_ids() { return $GLOBALS['mock_state']['featured_product_ids']; }
 function get_post_type( $id ) { return $GLOBALS['mock_state']['posts'][ $id ]->post_type ?? ''; }
 
+class WC_Product {}
+
+function wc_get_product( $id ) {
+	unset( $id );
+	return null;
+}
+
 require_once dirname( __DIR__ ) . '/includes/functions.php';
 require_once dirname( __DIR__ ) . '/includes/class-render.php';
-
+require_once dirname( __DIR__ ) . '/includes/class-cpt.php';
+require_once dirname( __DIR__ ) . '/includes/class-admin.php';
 require_once dirname( __DIR__ ) . '/includes/class-health-check.php';
