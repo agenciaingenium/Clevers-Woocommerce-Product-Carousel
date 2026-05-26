@@ -5,7 +5,7 @@
   "require": {},
   "require-dev": {
     "phpstan/phpstan": "^2.1",
-    "phpunit/phpunit": "^9.6"
+    "phpunit/phpunit": "^13.1"
   },
   "scripts": {
     "lint:php": "find . -type f -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l",
