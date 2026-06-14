@@ -20,7 +20,7 @@ $clevers_product_carousel_discount = clevers_product_carousel_get_discount_perce
         <?php endif; ?>
 
         <a href="<?php echo esc_url( $clevers_product_carousel_product->get_permalink() ); ?>" class="product-thumb" aria-label="<?php echo esc_attr( $clevers_product_carousel_product->get_name() ); ?>">
-            <?php echo wp_kses_post( $clevers_product_carousel_product->get_image( 'woocommerce_thumbnail' ) ); ?>
+            <?php echo wp_kses_post( clevers_product_carousel_add_lazy_loading( $clevers_product_carousel_product->get_image( 'woocommerce_thumbnail' ) ) ); ?>
         </a>
     </div>
 

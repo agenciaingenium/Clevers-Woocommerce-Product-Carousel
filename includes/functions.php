@@ -5,6 +5,109 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Agrega lazy loading a una imagen HTML.
+ *
+ * @param string $html HTML de la imagen.
+ * @return string HTML con lazy loading.
+ */
+function clevers_product_carousel_add_lazy_loading( string $html ): string {
+	if ( '' === $html ) {
+		return $html;
+	}
+
+	// Si ya tiene loading attribute, no hacer nada.
+	if ( false !== strpos( $html, 'loading=' ) ) {
+		return $html;
+	}
+
+	// Agregar loading="lazy" antes del cierre del tag img.
+	return str_replace( '<img ', '<img loading="lazy" ', $html );
+}
+
+/**
+ * Verifica si el servidor soporta WebP.
+ *
+ * @return bool
+ */
+function clevers_product_carousel_supports_webp(): bool {
+	if ( ! function_exists( 'wp_image_editor_supports' ) ) {
+		return false;
+	}
+
+	$supports = wp_image_editor_supports( array( 'mime_type' => 'image/webp' ) );
+	return is_array( $supports ) && ! empty( $supports['mime_type'] );
+}
+
+/**
+ * Obtiene la URL de imagen en formato WebP si está disponible.
+ *
+ * @param int    $attachment_id ID del attachment.
+ * @param string $size Tamaño de la imagen.
+ * @return string URL de la imagen (WebP o original).
+ */
+function clevers_product_carousel_get_webp_image_url( int $attachment_id, string $size = 'woocommerce_thumbnail' ): string {
+	if ( ! clevers_product_carousel_supports_webp() ) {
+		return '';
+	}
+
+	$image_data = wp_get_attachment_image_src( $attachment_id, $size );
+	if ( ! $image_data ) {
+		return '';
+	}
+
+	$original_url = $image_data[0];
+	$original_path = get_attached_file( $attachment_id );
+
+	if ( ! $original_path || ! file_exists( $original_path ) ) {
+		return '';
+	}
+
+	$info = pathinfo( $original_path );
+	$webp_path = $info['dirname'] . '/' . $info['filename'] . '.webp';
+
+	if ( file_exists( $webp_path ) ) {
+		$upload_dir = wp_upload_dir();
+		$webp_url = str_replace( $upload_dir['basedir'], $upload_dir['basedir'], $webp_path );
+		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $webp_url );
+	}
+
+	return '';
+}
+
+/**
+ * Agrega soporte WebP a una imagen HTML si está disponible.
+ *
+ * @param string $html HTML de la imagen.
+ * @param int    $attachment_id ID del attachment.
+ * @return string HTML con picture element si WebP está disponible.
+ */
+function clevers_product_carousel_add_webp_support( string $html, int $attachment_id ): string {
+	if ( '' === $html || $attachment_id <= 0 ) {
+		return $html;
+	}
+
+	$webp_url = clevers_product_carousel_get_webp_image_url( $attachment_id );
+	if ( '' === $webp_url ) {
+		return $html;
+	}
+
+	// Extraer la URL original de la imagen.
+	if ( ! preg_match( '/src="([^"]+)"/', $html, $matches ) ) {
+		return $html;
+	}
+
+	$original_url = $matches[1];
+
+	// Crear picture element con WebP y fallback.
+	$picture = '<picture>';
+	$picture .= '<source srcset="' . esc_url( $webp_url ) . '" type="image/webp">';
+	$picture .= str_replace( '<img ', '<img loading="lazy" ', $html );
+	$picture .= '</picture>';
+
+	return $picture;
+}
+
+/**
  * Obtiene los metadatos del carrusel.
  *
  * @param int $id ID del post.
