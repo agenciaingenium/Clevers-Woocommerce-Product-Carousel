@@ -1,0 +1,7 @@
+# Default code owners for the repository.
+# Any change to the matching paths requires a review from the listed owners
+# before the pull request can be merged (enforced via CODEOWNERS, not via
+# branch protection; pair with require_code_owner_reviews in branch protection
+# to fully wire it up).
+
+*       @agenciaingenium
