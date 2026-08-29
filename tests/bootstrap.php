@@ -117,6 +117,9 @@ function current_user_can( $cap ) { unset( $cap ); return true; }
 function delete_transient( $key ) { unset( $GLOBALS['mock_state']['transients'][ $key ] ); return true; }
 function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function esc_url( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_URL ); }
+function wp_get_attachment_image_src( $attachment_id, $size = 'thumbnail' ) { unset( $attachment_id, $size ); return false; }
+function get_attached_file( $attachment_id ) { unset( $attachment_id ); return false; }
 function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path = false ) { unset( $domain, $deprecated, $plugin_rel_path ); return true; }
 function plugin_basename( $file ) { return basename( dirname( $file ) ) . '/' . basename( $file ); }
 function wp_upload_dir() { return array( 'basedir' => sys_get_temp_dir() ); }

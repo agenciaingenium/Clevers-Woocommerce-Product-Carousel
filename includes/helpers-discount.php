@@ -78,7 +78,7 @@ if (!function_exists('clevers_product_carousel_render_discount_badge')) {
      * Render del badge de descuento (HTML).
      *
      * @param int         $percentage
-     * @param array       $settings   (opcional) para decidir clase extra según preset
+     * @param array<string, mixed> $settings   (opcional) para decidir clase extra según preset
      * @param string|null $extra_class
      * @return string
      */
@@ -86,7 +86,7 @@ if (!function_exists('clevers_product_carousel_render_discount_badge')) {
     {
         $classes = ['clevers_product_carousel-badge-discount'];
         if (!empty($settings['preset'])) {
-            $classes[] = 'preset-' . (int) $settings['preset'] . '-badge';
+            $classes[] = 'preset-' . clevers_product_carousel_to_int( $settings['preset'] ) . '-badge';
         }
         if ($extra_class) {
             $classes[] = $extra_class;

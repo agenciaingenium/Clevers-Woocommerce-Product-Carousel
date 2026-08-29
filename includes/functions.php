@@ -55,7 +55,6 @@ function clevers_product_carousel_get_webp_image_url( int $attachment_id, string
 		return '';
 	}
 
-	$original_url = $image_data[0];
 	$original_path = get_attached_file( $attachment_id );
 
 	if ( ! $original_path || ! file_exists( $original_path ) ) {
@@ -63,6 +62,9 @@ function clevers_product_carousel_get_webp_image_url( int $attachment_id, string
 	}
 
 	$info = pathinfo( $original_path );
+	if ( ! isset( $info['dirname'] ) || '' === $info['dirname'] ) {
+		return '';
+	}
 	$webp_path = $info['dirname'] . '/' . $info['filename'] . '.webp';
 
 	if ( file_exists( $webp_path ) ) {
@@ -111,7 +113,7 @@ function clevers_product_carousel_add_webp_support( string $html, int $attachmen
  * Obtiene los metadatos del carrusel.
  *
  * @param int $id ID del post.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_get_carousel_meta( $id ): array {
 	return (array) get_post_meta( $id, '_clv_settings', true );
@@ -165,6 +167,9 @@ function clevers_product_carousel_merge_product_ids( ?array $current, array $inc
  * @return string
  */
 function clevers_product_carousel_sanitize_css_value( $value ): string {
+	if ( ! is_string( $value ) && ! is_int( $value ) && ! is_float( $value ) ) {
+		return '';
+	}
 	$value = trim( (string) $value );
 	if ( '' === $value ) {
 		return '';
@@ -176,6 +181,24 @@ function clevers_product_carousel_sanitize_css_value( $value ): string {
 
 	$hex = sanitize_hex_color( $value );
 	return $hex ? $hex : '';
+}
+
+/**
+ * Converts numeric settings from WordPress metadata to integers safely.
+ *
+ * @param mixed $value
+ */
+function clevers_product_carousel_to_int( $value, int $default = 0 ): int {
+	return is_numeric( $value ) ? (int) $value : $default;
+}
+
+/**
+ * Converts scalar WordPress metadata to strings safely.
+ *
+ * @param mixed $value
+ */
+function clevers_product_carousel_to_string( $value, string $default = '' ): string {
+	return is_string( $value ) || is_int( $value ) || is_float( $value ) ? (string) $value : $default;
 }
 
 /**
@@ -201,21 +224,21 @@ function clevers_product_carousel_locate_template( $rel_path ): string {
  * Construye los argumentos de la query para el carrusel.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_build_query_args( $carousel_id ) {
 	$meta    = clevers_product_carousel_get_carousel_meta( $carousel_id );
-	$orderby = sanitize_text_field( (string) ( $meta['orderby'] ?? 'date' ) );
+	$orderby = sanitize_text_field( clevers_product_carousel_to_string( $meta['orderby'] ?? null, 'date' ) );
 
 	if ( ! in_array( $orderby, clevers_product_carousel_get_allowed_orderby_values(), true ) ) {
 		$orderby = 'date';
 	}
 
-	$order = strtoupper( sanitize_text_field( (string) ( $meta['order'] ?? 'DESC' ) ) );
+	$order = strtoupper( sanitize_text_field( clevers_product_carousel_to_string( $meta['order'] ?? null, 'DESC' ) ) );
 	$order = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 
 	$args = array(
-		'limit'  => max( 1, min( 48, (int) ( $meta['limit'] ?? 8 ) ) ),
+		'limit'  => max( 1, min( 48, clevers_product_carousel_to_int( $meta['limit'] ?? null, 8 ) ) ),
 		'order'  => $order,
 		'return' => 'objects',
 	);
@@ -223,7 +246,7 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
 	$manual_product_ids = array_values(
 		array_unique(
 			array_filter(
-				array_map( 'intval', (array) ( $meta['manual_product_ids'] ?? array() ) )
+				array_map( static function ( $id ): int { return clevers_product_carousel_to_int( $id ); }, (array) ( $meta['manual_product_ids'] ?? array() ) )
 			)
 		)
 	);
@@ -300,7 +323,7 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
  * Obtiene los ajustes del carrusel con valores por defecto.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_get_settings( $carousel_id ) {
 	$meta     = clevers_product_carousel_get_carousel_meta( $carousel_id );
@@ -341,7 +364,7 @@ function clevers_product_carousel_get_settings( $carousel_id ) {
  * Obtiene métricas de procesamiento del carrusel.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, int|float|string>
  */
 function clevers_product_carousel_get_queue_metrics( int $carousel_id ): array {
 	$defaults = array(

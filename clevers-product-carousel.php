@@ -44,13 +44,13 @@ require_once CLV_DIR . 'includes/class-admin.php';
 require_once CLV_DIR . 'includes/class-render.php';
 require_once CLV_DIR . 'includes/class-health-check.php';
 
-function clevers_product_carousel_load_textdomain() {
+function clevers_product_carousel_load_textdomain(): void {
 	load_plugin_textdomain( 'clevers-product-carousel', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }
 
 add_action( 'plugins_loaded', 'clevers_product_carousel_load_textdomain' );
 
-function clevers_product_carousel_init() {
+function clevers_product_carousel_init(): void {
 	$cpt = new Clevers_Product_Carousel_CPT();
 	$cpt->init();
 
