@@ -17,6 +17,9 @@
     "test": "phpunit --configuration phpunit.xml.dist"
   },
   "config": {
+    "platform": {
+      "php": "7.4.0"
+    },
     "sort-packages": true
   }
 }
