@@ -75,13 +75,43 @@ Each carousel includes color fields in the editor. You can also override CSS var
 ```
 
 = Does the plugin provide hooks/filters for developers? =
-Yes. Main extension points:
+Yes. The plugin offers several filters and actions for developers to extend its functionality:
 
-* `clevers_carousel_query_args` (filter): modify product query args before product lookup.
-* `clevers_carousel_template_path` (filter): override template relative path inside `templates/`.
-* `clevers_carousel_css_vars` (filter): adjust per-carousel CSS variables before inline output.
-* `clevers_carousel_before_render` (action): fires right before carousel template rendering.
-* `clevers_carousel_after_render` (action): fires right after carousel template rendering.
+**Filters:**
+
+* `clevers_carousel_query_args` (filter): Modify product query args before product lookup. Receives `$args`, `$carousel_id`, and `$meta`.
+* `clevers_carousel_template_path` (filter): Override template relative path inside `templates/`.
+* `clevers_carousel_css_vars` (filter): Adjust per-carousel CSS variables before inline output. Receives `$vars`, `$carousel_id`, `$settings`, and `$vars_map`.
+* `clevers_carousel/cache_ttl` (filter): Control the TTL of the transient cache for rendered carousel HTML.
+* `clevers_carousel/settings` (filter): Modify carousel settings before rendering.
+* `clevers_carousel/card_template_relpath` (filter): Override card template path.
+* `clevers_carousel/slider_data_attributes` (filter): Modify slider data attributes.
+
+**Actions:**
+
+* `clevers_carousel_before_render` (action): Fires right before carousel template rendering. Receives `$carousel_id`, `$settings`, and `$products`.
+* `clevers_carousel_after_render` (action): Fires right after carousel template rendering. Receives `$carousel_id`, `$settings`, and `$products`.
+
+**Examples:**
+
+```php
+// Modify query to limit price range
+add_filter( 'clevers_carousel_query_args', function( $args, $carousel_id, $meta ) {
+    $args['price_range'] = [ 20, 200 ];
+    return $args;
+}, 10, 3 );
+
+// Add custom CSS variables
+add_filter( 'clevers_carousel_css_vars', function( $vars, $carousel_id, $settings, $vars_map ) {
+    $vars[] = '--clevers-margen-cards: 24px;';
+    return $vars;
+}, 10, 4 );
+
+// Track carousel renders
+add_action( 'clevers_carousel_before_render', function( $carousel_id, $settings, $products ) {
+    do_action( 'mi_tracking/carousel_render_start', $carousel_id, count( $products ) );
+}, 10, 3 );
+```
 
 Namespace variants such as `clevers_carousel/query_args`, `clevers_carousel/before`, and `clevers_carousel/after` are also available.
 

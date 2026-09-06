@@ -105,5 +105,33 @@ function clevers_product_carousel_bump_readme_stable_tag( string $file, string $
 clevers_product_carousel_bump_plugin_header_version( $clevers_product_carousel_root . '/clevers-product-carousel.php', $clevers_product_carousel_new_version );
 clevers_product_carousel_bump_readme_stable_tag( $clevers_product_carousel_root . '/readme.txt', $clevers_product_carousel_new_version );
 
+/**
+ * Actualiza la badge de version en README.md.
+ */
+function clevers_product_carousel_bump_readme_badge( string $file, string $new_version ): void {
+	if ( ! file_exists( $file ) ) {
+		echo "Archivo no encontrado: {$file}\n";
+		return;
+	}
+
+	$content = file_get_contents( $file );
+	if ( false === $content ) {
+		return;
+	}
+
+	$pattern = '/!\[Version\]\(https:\/\/img\.shields\.io\/badge\/version-)[0-9]+\.[0-9]+\.[0-9]+(-blue\)/';
+	$replacement = '${1}' . $new_version . '${2}';
+	$new_content = preg_replace( $pattern, $replacement, $content );
+
+	if ( $new_content !== $content ) {
+		file_put_contents( $file, $new_content );
+		echo "Actualizado README.md badge a version {$new_version}.\n";
+	} else {
+		echo "No se encontro badge de version en {$file}\n";
+	}
+}
+
+clevers_product_carousel_bump_readme_badge( $clevers_product_carousel_root . '/README.md', $clevers_product_carousel_new_version );
+
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI utility output.
 echo "\nListo. Revisa los cambios con: git diff\n";

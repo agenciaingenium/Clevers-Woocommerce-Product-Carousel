@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Clevers_Product_Carousel_Render {
 
-	public function init() {
+	public function init(): void {
 		add_shortcode( 'clevers_carousel', array( $this, 'shortcode' ) );
 		add_action( 'init', array( $this, 'register_block_type' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_assets' ) );
@@ -23,7 +23,7 @@ class Clevers_Product_Carousel_Render {
 		add_action( 'deleted_post_meta', array( $this, 'invalidate_cache_on_product_meta_change' ), 10, 4 );
 	}
 
-	public function maybe_enqueue_assets() {
+	public function maybe_enqueue_assets(): void {
 		if ( is_admin() || ! is_singular() ) {
 			return;
 		}
@@ -51,7 +51,10 @@ class Clevers_Product_Carousel_Render {
 		wp_enqueue_script( 'clv-carousel' );
 	}
 
-	public function shortcode( $atts ) {
+	/** @param array<string, mixed>|string $atts */
+	public function shortcode( $atts ): string {
+		$atts = is_array( $atts ) ? $atts : array();
+
 		$atts = shortcode_atts(
 			array(
 				'id' => 0,
@@ -62,7 +65,7 @@ class Clevers_Product_Carousel_Render {
 		return $this->render_carousel( (int) $atts['id'] );
 	}
 
-	public function register_block_type() {
+	public function register_block_type(): void {
 		if ( ! function_exists( 'register_block_type' ) ) {
 			return;
 		}
@@ -96,12 +99,13 @@ class Clevers_Product_Carousel_Render {
 		);
 	}
 
-	public function render_block( $attributes ) {
-		$carousel_id = isset( $attributes['carouselId'] ) ? (int) $attributes['carouselId'] : 0;
+	/** @param array<string, mixed> $attributes */
+	public function render_block( array $attributes ): string {
+		$carousel_id = clevers_product_carousel_to_int( $attributes['carouselId'] ?? null );
 		return $this->render_carousel( $carousel_id );
 	}
 
-	public function render_carousel( $carousel_id ) {
+	public function render_carousel( int $carousel_id ): string {
 		if ( ! class_exists( 'WooCommerce' ) || $carousel_id <= 0 ) {
 			return '';
 		}
@@ -148,7 +152,7 @@ class Clevers_Product_Carousel_Render {
 			do_action( 'clevers_carousel/before', $carousel_id, $settings, $products );
 			do_action( 'clevers_carousel_before_render', $carousel_id, $settings, $products );
 
-			$template_rel = 'carousels/carousel-' . (int) ( $settings['preset'] ?? 1 ) . '.php';
+			$template_rel = 'carousels/carousel-' . clevers_product_carousel_to_int( $settings['preset'] ?? null, 1 ) . '.php';
 			$template_rel = apply_filters( 'clevers_carousel/carousel_template_relpath', $template_rel, $carousel_id, $settings, $products );
 			include clevers_product_carousel_locate_template( $template_rel );
 
@@ -198,11 +202,14 @@ class Clevers_Product_Carousel_Render {
 	 * @return string
 	 */
 	private function inject_brizy_editor_preview_css( string $html ): string {
-		if ( '' === $html ) {
-			return $html;
-		}
+	if ( '' === $html ) {
+		return $html;
+	}
+	if ( ! clevers_product_carousel_is_brizy_editor_preview_request() ) {
+		return $html;
+	}
 
-		$marker = '<!-- Clevers Carousel Brizy preview CSS -->';
+	$marker = '<!-- Clevers Carousel Brizy preview CSS -->';
 		if ( false !== strpos( $html, $marker ) ) {
 			return $html;
 		}
@@ -219,7 +226,8 @@ class Clevers_Product_Carousel_Render {
 	}
 
 
-	private function enqueue_inline_vars( $carousel_id, array $settings ) {
+	/** @param array<string, mixed> $settings */
+	private function enqueue_inline_vars( int $carousel_id, array $settings ): void {
 		$vars_map = array(
 			'color_primary'     => '--clevers-primary',
 			'color_primary2'    => '--clevers-primary-hover',
@@ -257,11 +265,11 @@ class Clevers_Product_Carousel_Render {
 			return;
 		}
 
-		$inline = '#clevers-product-carousel-' . (int) $carousel_id . '{' . implode( '', $vars ) . '}';
+		$inline = '#clevers-product-carousel-' . $carousel_id . '{' . implode( '', array_map( static function ( $value ): string { return clevers_product_carousel_to_string( $value ); }, $vars ) ) . '}';
 		wp_add_inline_style( 'clv-carousel', $inline );
 	}
 
-	public function invalidate_cache() {
+	public function invalidate_cache(): void {
 		update_option(
 			'clv_global_cache_bump',
 			(int) get_option( 'clv_global_cache_bump', 0 ) + 1,
@@ -269,7 +277,15 @@ class Clevers_Product_Carousel_Render {
 		);
 	}
 
-	public function invalidate_cache_on_terms_change( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+	/**
+	 * @param int $object_id
+	 * @param mixed $terms
+	 * @param mixed $tt_ids
+	 * @param string $taxonomy
+	 * @param bool $append
+	 * @param mixed $old_tt_ids
+	 */
+	public function invalidate_cache_on_terms_change( int $object_id, $terms, $tt_ids, string $taxonomy, bool $append, $old_tt_ids ): void {
 		unset( $terms, $tt_ids, $append, $old_tt_ids );
 
 		if ( 'product_cat' !== $taxonomy && 'product_tag' !== $taxonomy ) {
@@ -284,7 +300,13 @@ class Clevers_Product_Carousel_Render {
 		$this->invalidate_cache();
 	}
 
-	public function invalidate_cache_on_product_meta_change( $meta_id, $object_id, $meta_key, $meta_value ) {
+	/**
+	 * @param mixed $meta_id
+	 * @param int $object_id
+	 * @param string $meta_key
+	 * @param mixed $meta_value
+	 */
+	public function invalidate_cache_on_product_meta_change( $meta_id, int $object_id, string $meta_key, $meta_value ): void {
 		unset( $meta_id, $meta_value );
 
 		$post_type = get_post_type( (int) $object_id );
@@ -313,7 +335,7 @@ class Clevers_Product_Carousel_Render {
  * Helper functions for templates.
  *
  * @param WC_Product $clevers_product_carousel_product Producto.
- * @param array      $settings Ajustes.
+ * @param array<string, mixed> $settings Ajustes.
  * @return void
  */
 function clevers_product_carousel_render_card( $clevers_product_carousel_product, $settings ) {
@@ -321,7 +343,7 @@ function clevers_product_carousel_render_card( $clevers_product_carousel_product
 	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WooCommerce template compatibility.
 	$GLOBALS['product'] = $clevers_product_carousel_product;
 
-	$tpl = 'cards/card-' . (int) ( $settings['preset'] ?? 1 ) . '.php';
+	$tpl = 'cards/card-' . clevers_product_carousel_to_int( $settings['preset'] ?? null, 1 ) . '.php';
 	$tpl = apply_filters( 'clevers_carousel/card_template_relpath', $tpl, $clevers_product_carousel_product, $settings );
 
 	include clevers_product_carousel_locate_template( $tpl );
@@ -331,24 +353,24 @@ function clevers_product_carousel_render_card( $clevers_product_carousel_product
  * Construye atributos para el contenedor Slick.
  *
  * @param int   $carousel_id ID del carrusel.
- * @param array $settings Ajustes.
+ * @param array<string, mixed> $settings Ajustes.
  * @return string
  */
 function clevers_product_carousel_get_slider_data_attributes( $carousel_id, array $settings ): string {
 	$attrs = array(
-		'data-carousel-id'      => (string) (int) $carousel_id,
-			'data-slides'           => (string) max( 1, min( 8, (int) ( $settings['slidesToShow'] ?? 4 ) ) ),
-			'data-slides-tablet'    => (string) max( 1, min( 8, (int) ( $settings['slidesToShowTablet'] ?? 2 ) ) ),
-			'data-slides-mobile'    => (string) max( 1, min( 8, (int) ( $settings['slidesToShowMobile'] ?? 1 ) ) ),
+		'data-carousel-id'      => (string) clevers_product_carousel_to_int( $carousel_id ),
+			'data-slides'           => (string) max( 1, min( 8, clevers_product_carousel_to_int( $settings['slidesToShow'] ?? null, 4 ) ) ),
+			'data-slides-tablet'    => (string) max( 1, min( 8, clevers_product_carousel_to_int( $settings['slidesToShowTablet'] ?? null, 2 ) ) ),
+			'data-slides-mobile'    => (string) max( 1, min( 8, clevers_product_carousel_to_int( $settings['slidesToShowMobile'] ?? null, 1 ) ) ),
 		'data-autoplay'         => ! empty( $settings['autoplay'] ) ? 'true' : 'false',
-		'data-speed'            => (string) max( 500, min( 60000, (int) ( $settings['autoplayMs'] ?? 3000 ) ) ),
+		'data-speed'            => (string) max( 500, min( 60000, clevers_product_carousel_to_int( $settings['autoplayMs'] ?? null, 3000 ) ) ),
 		'data-dots'             => ! empty( $settings['dots'] ) ? 'true' : 'false',
 		'data-arrows'           => ! empty( $settings['arrows'] ) ? 'true' : 'false',
 		'data-pause-on-hover'   => ! empty( $settings['pauseOnHover'] ) ? 'true' : 'false',
 		'data-pause-on-focus'   => ! empty( $settings['pauseOnFocus'] ) ? 'true' : 'false',
 			'data-reduced-motion'   => ! empty( $settings['reducedMotionAutoplayOff'] ) ? 'true' : 'false',
 			'data-builder-compat'   => ! empty( $settings['builder_compat_mode'] ) ? 'true' : 'false',
-			'data-builder-delay'    => (string) max( 0, min( 5000, (int) ( $settings['builder_init_delay_ms'] ?? 0 ) ) ),
+			'data-builder-delay'    => (string) max( 0, min( 5000, clevers_product_carousel_to_int( $settings['builder_init_delay_ms'] ?? null ) ) ),
 			'data-disable-center-on-builder' => ! empty( $settings['builder_disable_center_mode'] ) ? 'true' : 'false',
 	);
 

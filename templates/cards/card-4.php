@@ -41,7 +41,7 @@ $clevers_product_carousel_aria_label = sprintf(
                 <?php echo wp_kses_post( clevers_product_carousel_render_discount_badge( (int) $clevers_product_carousel_discount, $settings, 'badge-discount' ) ); ?>
             <?php endif; ?>
 
-            <?php echo wp_kses_post($clevers_product_carousel_img); ?>
+            <?php echo wp_kses_post( clevers_product_carousel_add_lazy_loading( $clevers_product_carousel_img ) ); ?>
 
         </a>
             <a href="<?php echo esc_url($clevers_product_carousel_permalink); ?>" class="button select-options" aria-label="<?php echo esc_attr( $clevers_product_carousel_aria_label ); ?>">

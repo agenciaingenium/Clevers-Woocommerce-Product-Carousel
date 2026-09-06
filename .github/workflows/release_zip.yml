@@ -106,6 +106,28 @@ jobs:
           zip -r "dist/${PLUGIN_SLUG}-${{ steps.ver.outputs.version }}.zip" "$PLUGIN_SLUG"
           ls -lh dist
 
+      - name: Validate zip contents (no dev artifacts)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP_FILE=$(find "$BUILD_ROOT/dist" -name "*.zip" -type f | head -1)
+          [ -n "$ZIP_FILE" ] || { echo "::error::No zip file found in dist"; exit 1; }
+
+          # Patrones que NO deben estar en la release. Si .distignore los
+          # cubre pero el zip igual los trae, fallamos el build.
+          FORBIDDEN_REGEX='(^|/)\.idea/|(^|/)\.git/|(^|/)\.github/|(^|/)tests/|(^|/)bin/|(^|/)node_modules/|(^|/)phpunit\.xml|(^|/)phpcs\.xml|(^|/)phpstan\.neon|(^|/)\.phpunit\.result\.cache|\.log$|\.zip$'
+
+          LISTING=$(unzip -Z1 "$ZIP_FILE")
+
+          HITS=$(echo "$LISTING" | grep -E "$FORBIDDEN_REGEX" || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::Forbidden dev artifacts found in release zip:"
+            echo "$HITS"
+            exit 1
+          fi
+
+          echo "Zip contents validated: no dev artifacts."
+
       - name: Attach ZIP to GitHub Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2

@@ -33,7 +33,7 @@ $clevers_product_carousel_discount = clevers_product_carousel_get_discount_perce
             <?php echo wp_kses_post( clevers_product_carousel_render_discount_badge( (int) $clevers_product_carousel_discount, $settings, 'badge-discount' ) ); ?>
         <?php endif; ?>
 
-        <?php echo wp_kses_post( $clevers_product_carousel_img ); ?>
+        <?php echo wp_kses_post( clevers_product_carousel_add_lazy_loading( $clevers_product_carousel_img ) ); ?>
     </a>
 
     <div class="product-info">

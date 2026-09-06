@@ -67,6 +67,14 @@ class WC_Product_Query {
 	}
 }
 
+class WC_Product {
+	public function is_on_sale() { return false; }
+	public function is_type( $type ) { return false; }
+	public function get_regular_price() { return ''; }
+	public function get_sale_price() { return ''; }
+	public function get_children() { return array(); }
+}
+
 function get_post_meta( $id, $key = '', $single = false ) {
 	if ( '' === $key ) {
 		return $GLOBALS['mock_state']['post_meta'][ $id ] ?? array();
@@ -109,6 +117,9 @@ function current_user_can( $cap ) { unset( $cap ); return true; }
 function delete_transient( $key ) { unset( $GLOBALS['mock_state']['transients'][ $key ] ); return true; }
 function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+function esc_url( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_URL ); }
+function wp_get_attachment_image_src( $attachment_id, $size = 'thumbnail' ) { unset( $attachment_id, $size ); return false; }
+function get_attached_file( $attachment_id ) { unset( $attachment_id ); return false; }
 function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path = false ) { unset( $domain, $deprecated, $plugin_rel_path ); return true; }
 function plugin_basename( $file ) { return basename( dirname( $file ) ) . '/' . basename( $file ); }
 function wp_upload_dir() { return array( 'basedir' => sys_get_temp_dir() ); }
@@ -124,7 +135,11 @@ function apply_filters( $hook, $value ) {
 function add_filter( $hook, $callback ) { $GLOBALS['mock_state']['filters'][ $hook ][] = $callback; return true; }
 function add_action( $hook, $callback, ...$args ) { unset( $args ); $GLOBALS['mock_state']['actions'][ $hook ][] = $callback; return true; }
 function add_shortcode( $tag, $callback ) { $GLOBALS['mock_state']['shortcodes'][ $tag ] = $callback; return true; }
-function do_action( $hook, ...$args ) { unset( $hook, $args ); }
+function do_action( $hook, ...$args ) {
+	foreach ( $GLOBALS['mock_state']['actions'][ $hook ] ?? array() as $cb ) {
+		$cb( ...$args );
+	}
+}
 function plugin_dir_path( $file ) { return dirname( $file ) . '/'; }
 function plugin_dir_url( $file ) { return 'https://example.test/' . basename( dirname( $file ) ) . '/'; }
 function locate_template( $template ) { unset( $template ); return $GLOBALS['mock_state']['locate_template_value']; }
@@ -143,14 +158,13 @@ function wc_get_product_ids_on_sale() { return $GLOBALS['mock_state']['product_i
 function wc_get_featured_product_ids() { return $GLOBALS['mock_state']['featured_product_ids']; }
 function get_post_type( $id ) { return $GLOBALS['mock_state']['posts'][ $id ]->post_type ?? ''; }
 
-class WC_Product {}
-
 function wc_get_product( $id ) {
 	unset( $id );
 	return null;
 }
 
 require_once dirname( __DIR__ ) . '/includes/functions.php';
+require_once dirname( __DIR__ ) . '/includes/helpers-discount.php';
 require_once dirname( __DIR__ ) . '/includes/class-render.php';
 require_once dirname( __DIR__ ) . '/includes/class-cpt.php';
 require_once dirname( __DIR__ ) . '/includes/class-admin.php';

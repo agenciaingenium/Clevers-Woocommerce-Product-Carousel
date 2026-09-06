@@ -5,10 +5,116 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Agrega lazy loading a una imagen HTML.
+ *
+ * @param string $html HTML de la imagen.
+ * @return string HTML con lazy loading.
+ */
+function clevers_product_carousel_add_lazy_loading( string $html ): string {
+	if ( '' === $html ) {
+		return $html;
+	}
+
+	// Si ya tiene loading attribute, no hacer nada.
+	if ( false !== strpos( $html, 'loading=' ) ) {
+		return $html;
+	}
+
+	// Agregar loading="lazy" antes del cierre del tag img.
+	return str_replace( '<img ', '<img loading="lazy" ', $html );
+}
+
+/**
+ * Verifica si el servidor soporta WebP.
+ *
+ * @return bool
+ */
+function clevers_product_carousel_supports_webp(): bool {
+	if ( ! function_exists( 'wp_image_editor_supports' ) ) {
+		return false;
+	}
+
+	return (bool) wp_image_editor_supports( array( 'mime_type' => 'image/webp' ) );
+}
+
+/**
+ * Obtiene la URL de imagen en formato WebP si está disponible.
+ *
+ * @param int    $attachment_id ID del attachment.
+ * @param string $size Tamaño de la imagen.
+ * @return string URL de la imagen (WebP o original).
+ */
+function clevers_product_carousel_get_webp_image_url( int $attachment_id, string $size = 'woocommerce_thumbnail' ): string {
+	if ( ! clevers_product_carousel_supports_webp() ) {
+		return '';
+	}
+
+	$image_data = wp_get_attachment_image_src( $attachment_id, $size );
+	if ( ! $image_data ) {
+		return '';
+	}
+
+	$upload_dir = wp_upload_dir();
+	$image_url  = $image_data[0];
+	if ( 0 !== strpos( $image_url, $upload_dir['baseurl'] ) ) {
+		return '';
+	}
+	$image_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $image_url );
+	if ( ! file_exists( $image_path ) ) {
+		return '';
+	}
+
+	$info = pathinfo( $image_path );
+	if ( ! isset( $info['dirname'] ) || '' === $info['dirname'] ) {
+		return '';
+	}
+	$webp_path = $info['dirname'] . '/' . $info['filename'] . '.webp';
+
+	if ( file_exists( $webp_path ) ) {
+		return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $webp_path );
+	}
+
+	return '';
+}
+
+/**
+ * Agrega soporte WebP a una imagen HTML si está disponible.
+ *
+ * @param string $html HTML de la imagen.
+ * @param int    $attachment_id ID del attachment.
+ * @return string HTML con picture element si WebP está disponible.
+ */
+function clevers_product_carousel_add_webp_support( string $html, int $attachment_id ): string {
+	if ( '' === $html || $attachment_id <= 0 ) {
+		return $html;
+	}
+
+	$webp_url = clevers_product_carousel_get_webp_image_url( $attachment_id );
+	if ( '' === $webp_url ) {
+		return $html;
+	}
+
+	// Extraer la URL original de la imagen.
+	if ( ! preg_match( '/src="([^"]+)"/', $html, $matches ) ) {
+		return $html;
+	}
+
+	$original_url = $matches[1];
+
+	// Crear picture element con WebP y fallback.
+	$picture = '<picture>';
+	$picture .= '<source srcset="' . esc_url( $webp_url ) . '" type="image/webp">';
+	$picture .= str_replace( '<img ', '<img loading="lazy" ', $html );
+	$picture .= '</picture>';
+
+	return $picture;
+}
+
+/**
  * Obtiene los metadatos del carrusel.
  *
  * @param int $id ID del post.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_get_carousel_meta( $id ): array {
 	return (array) get_post_meta( $id, '_clv_settings', true );
@@ -62,6 +168,9 @@ function clevers_product_carousel_merge_product_ids( ?array $current, array $inc
  * @return string
  */
 function clevers_product_carousel_sanitize_css_value( $value ): string {
+	if ( ! is_string( $value ) && ! is_int( $value ) && ! is_float( $value ) ) {
+		return '';
+	}
 	$value = trim( (string) $value );
 	if ( '' === $value ) {
 		return '';
@@ -73,6 +182,24 @@ function clevers_product_carousel_sanitize_css_value( $value ): string {
 
 	$hex = sanitize_hex_color( $value );
 	return $hex ? $hex : '';
+}
+
+/**
+ * Converts numeric settings from WordPress metadata to integers safely.
+ *
+ * @param mixed $value
+ */
+function clevers_product_carousel_to_int( $value, int $default = 0 ): int {
+	return is_numeric( $value ) ? (int) $value : $default;
+}
+
+/**
+ * Converts scalar WordPress metadata to strings safely.
+ *
+ * @param mixed $value
+ */
+function clevers_product_carousel_to_string( $value, string $default = '' ): string {
+	return is_string( $value ) || is_int( $value ) || is_float( $value ) ? (string) $value : $default;
 }
 
 /**
@@ -98,21 +225,21 @@ function clevers_product_carousel_locate_template( $rel_path ): string {
  * Construye los argumentos de la query para el carrusel.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_build_query_args( $carousel_id ) {
 	$meta    = clevers_product_carousel_get_carousel_meta( $carousel_id );
-	$orderby = sanitize_text_field( (string) ( $meta['orderby'] ?? 'date' ) );
+	$orderby = sanitize_text_field( clevers_product_carousel_to_string( $meta['orderby'] ?? null, 'date' ) );
 
 	if ( ! in_array( $orderby, clevers_product_carousel_get_allowed_orderby_values(), true ) ) {
 		$orderby = 'date';
 	}
 
-	$order = strtoupper( sanitize_text_field( (string) ( $meta['order'] ?? 'DESC' ) ) );
+	$order = strtoupper( sanitize_text_field( clevers_product_carousel_to_string( $meta['order'] ?? null, 'DESC' ) ) );
 	$order = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 
 	$args = array(
-		'limit'  => max( 1, min( 48, (int) ( $meta['limit'] ?? 8 ) ) ),
+		'limit'  => max( 1, min( 48, clevers_product_carousel_to_int( $meta['limit'] ?? null, 8 ) ) ),
 		'order'  => $order,
 		'return' => 'objects',
 	);
@@ -120,7 +247,7 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
 	$manual_product_ids = array_values(
 		array_unique(
 			array_filter(
-				array_map( 'intval', (array) ( $meta['manual_product_ids'] ?? array() ) )
+				array_map( static function ( $id ): int { return clevers_product_carousel_to_int( $id ); }, (array) ( $meta['manual_product_ids'] ?? array() ) )
 			)
 		)
 	);
@@ -197,7 +324,7 @@ function clevers_product_carousel_build_query_args( $carousel_id ) {
  * Obtiene los ajustes del carrusel con valores por defecto.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, mixed>
  */
 function clevers_product_carousel_get_settings( $carousel_id ) {
 	$meta     = clevers_product_carousel_get_carousel_meta( $carousel_id );
@@ -238,7 +365,7 @@ function clevers_product_carousel_get_settings( $carousel_id ) {
  * Obtiene métricas de procesamiento del carrusel.
  *
  * @param int $carousel_id ID del carrusel.
- * @return array
+ * @return array<string, int|float|string>
  */
 function clevers_product_carousel_get_queue_metrics( int $carousel_id ): array {
 	$defaults = array(

@@ -7,7 +7,7 @@
 ![WordPress Tested](https://img.shields.io/badge/Tested%20up%20to-6.7-blue?logo=wordpress)
 ![WooCommerce Compatible](https://img.shields.io/badge/WooCommerce-Compatible-success?logo=woocommerce)
 ![License](https://img.shields.io/badge/license-GPLv2-orange)
-![Version](https://img.shields.io/badge/version-1.2.1-blue)
+![Version](https://img.shields.io/badge/version-1.2.3-blue)
 [![CI](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/php-compatibility.yml/badge.svg)](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/php-compatibility.yml)
 [![Release](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/create_release.yml/badge.svg)](https://github.com/agenciaingenium/Clevers-Woocommerce-Product-Carousel/actions/workflows/create_release.yml)
 
@@ -140,15 +140,104 @@ El sistema cargará automáticamente tu versión.
 
 ## 🪝 Hooks y filters para desarrolladores
 
-Puedes extender el plugin con los siguientes hooks principales:
+Puedes extender el plugin con los siguientes hooks principales. Las firmas
+muestran los argumentos que recibe tu callback y el tipo de retorno esperado.
 
-- `clevers_carousel_query_args` *(filter)*: modifica los argumentos de consulta de productos antes de ejecutar la query.
-- `clevers_carousel_template_path` *(filter)*: permite ajustar la ruta relativa de templates dentro de `templates/`.
-- `clevers_carousel_css_vars` *(filter)*: modifica el arreglo de variables CSS por carrusel antes de imprimirlas inline.
-- `clevers_carousel_before_render` *(action)*: se ejecuta justo antes de renderizar el template del carrusel.
-- `clevers_carousel_after_render` *(action)*: se ejecuta justo después de renderizar el template del carrusel.
+### Filtros
 
-> Nota: También siguen disponibles los hooks con formato namespace como `clevers_carousel/query_args`, `clevers_carousel/before` y `clevers_carousel/after`.
+#### `clevers_carousel_query_args` *(filter)*
+
+Modifica los argumentos de `WC_Product_Query` antes de ejecutarla.
+Útil para añadir restricciones de stock, precio máximo, visibilidad, etc.
+
+```php
+/**
+ * @param array  $args        Argumentos de WC_Product_Query.
+ * @param int    $carousel_id ID del carrusel.
+ * @param array  $meta        Meta del carrusel guardado en post meta.
+ * @return array
+ */
+add_filter( 'clevers_carousel_query_args', function( $args, $carousel_id, $meta ) {
+    // Limitar a productos con precio entre $20 y $200, visibles en catálogo.
+    $args['price_range'] = [ 20, 200 ];
+    $args['visibility']  = 'visible';
+    return $args;
+}, 10, 3 );
+```
+
+#### `clevers_carousel_css_vars` *(filter)*
+
+Modifica el arreglo de variables CSS que se imprimen inline por carrusel.
+Cada entrada es un string `"--nombre-var: valor;"`.
+
+```php
+/**
+ * @param array $vars       Variables CSS finales que se imprimirán.
+ * @param int   $carousel_id
+ * @param array $settings   Configuración del carrusel.
+ * @param array $vars_map   Mapa setting_key => nombre de variable CSS.
+ * @return array
+ */
+add_filter( 'clevers_carousel_css_vars', function( $vars, $carousel_id, $settings, $vars_map ) {
+    // Añadir una variable personalizada (útil para CSS propio en el tema).
+    $vars[] = '--clevers-margen-cards: 24px;';
+    $vars[] = '--clevers-radio-cards: 12px;';
+    return $vars;
+}, 10, 4 );
+```
+
+#### `clevers_carousel_template_path` *(filter)*
+
+Ajusta la ruta relativa usada para localizar templates dentro de `templates/`.
+
+```php
+/**
+ * @param string $rel_path Ruta actual (p.ej. "carousels/carousel-1.php").
+ * @return string
+ */
+add_filter( 'clevers_carousel_template_path', function( $rel_path ) {
+    // Forzar un template alternativo para todos los carruseles.
+    return str_replace( 'carousels/carousel-', 'carousels/custom-', $rel_path );
+} );
+```
+
+#### `clevers_carousel/cache_ttl` *(filter)*
+
+Controla el TTL del transient que cachea el HTML renderizado del carrusel.
+
+```php
+add_filter( 'clevers_carousel/cache_ttl', function( $ttl, $carousel_id, $settings, $args ) {
+    // Carruseles con filtro manual (productos elegidos a mano) pueden cachear más.
+    if ( ! empty( $settings['manual_products_enabled'] ) ) {
+        return HOUR_IN_SECONDS;
+    }
+    return $ttl;
+}, 10, 4 );
+```
+
+### Acciones
+
+#### `clevers_carousel_before_render` / `clevers_carousel_after_render` *(actions)*
+
+Se ejecutan justo antes/después de incluir el template del carrusel. Útil
+para inyectar markup, registrar JS extra o emitir métricas.
+
+```php
+add_action( 'clevers_carousel_before_render', function( $carousel_id, $settings, $products ) {
+    // P.ej. anunciar el evento a tu sistema de analytics.
+    do_action( 'mi_tracking/carousel_render_start', $carousel_id, count( $products ) );
+}, 10, 3 );
+
+add_action( 'clevers_carousel_after_render', function( $carousel_id, $settings, $products ) {
+    do_action( 'mi_tracking/carousel_render_end', $carousel_id );
+}, 10, 3 );
+```
+
+> **Formato namespaced:** también están disponibles las variantes con `/`
+> — `clevers_carousel/query_args`, `clevers_carousel/cache_ttl`,
+> `clevers_carousel/before`, `clevers_carousel/after`,
+> `clevers_carousel/products`, `clevers_carousel/rendered_html`. Las firmas
+> son equivalentes; elegí la convención que prefieras.
 
 ---
 

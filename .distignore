@@ -12,6 +12,8 @@ tests
 vendor/bin
 phpcs.xml*
 phpunit.xml*
+phpstan.neon
+phpstan.neon.dist
 .phpunit.result.cache
 *.lock
 *.log
